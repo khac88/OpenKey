@@ -46,6 +46,8 @@ static const CGFloat kPanelWidth = 780;
 static const CGFloat kPanelHeight = 640;
 static const CGFloat kSidebarWidth = 200;
 static const CGFloat kFooterHeight = 60;
+static const CGFloat kSidebarInset = 8;
+static const CGFloat kSidebarCornerRadius = 20;
 
 // Flipped container so that a page starts at the top of its scroll view.
 @interface OKFlippedView : NSView
@@ -197,12 +199,13 @@ static const CGFloat kFooterHeight = 60;
 
 -(void)buildSidebar {
     NSView* root = self.view;
-    NSVisualEffectView* sidebar = [[NSVisualEffectView alloc] init];
-    sidebar.material = NSVisualEffectMaterialSidebar;
-    sidebar.blendingMode = NSVisualEffectBlendingModeBehindWindow;
-    sidebar.state = NSVisualEffectStateFollowsWindowActiveState;
-    sidebar.translatesAutoresizingMaskIntoConstraints = NO;
-    [root addSubview:sidebar];
+    //floating Liquid Glass sidebar, its items live in the glass content view
+    NSGlassEffectView* glass = [[NSGlassEffectView alloc] init];
+    glass.cornerRadius = kSidebarCornerRadius;
+    glass.translatesAutoresizingMaskIntoConstraints = NO;
+    [root addSubview:glass];
+    NSView* sidebar = [[NSView alloc] init];
+    glass.contentView = sidebar;
     
     //app title
     NSImageView* icon = [NSImageView imageViewWithImage:[NSApp applicationIconImage]];
@@ -241,7 +244,7 @@ static const CGFloat kFooterHeight = 60;
         
         NSView* item = [[NSView alloc] init];
         item.wantsLayer = YES;
-        item.layer.cornerRadius = 7;
+        item.layer.cornerRadius = 16;
         item.translatesAutoresizingMaskIntoConstraints = NO;
         [item addSubview:button];
         [nav addArrangedSubview:item];
@@ -271,21 +274,14 @@ static const CGFloat kFooterHeight = 60;
     status.translatesAutoresizingMaskIntoConstraints = NO;
     [sidebar addSubview:status];
     
-    NSBox* line = [self separator];
-    [root addSubview:line];
-    
     [NSLayoutConstraint activateConstraints:@[
-        [sidebar.leadingAnchor constraintEqualToAnchor:root.leadingAnchor],
-        [sidebar.topAnchor constraintEqualToAnchor:root.topAnchor],
-        [sidebar.bottomAnchor constraintEqualToAnchor:footerView.topAnchor],
-        [sidebar.widthAnchor constraintEqualToConstant:kSidebarWidth],
-        [line.topAnchor constraintEqualToAnchor:sidebar.topAnchor],
-        [line.bottomAnchor constraintEqualToAnchor:sidebar.bottomAnchor],
-        [line.leadingAnchor constraintEqualToAnchor:sidebar.trailingAnchor],
-        [line.widthAnchor constraintEqualToConstant:1],
+        [glass.leadingAnchor constraintEqualToAnchor:root.leadingAnchor constant:kSidebarInset],
+        [glass.topAnchor constraintEqualToAnchor:root.topAnchor constant:kSidebarInset],
+        [glass.bottomAnchor constraintEqualToAnchor:footerView.topAnchor constant:-kSidebarInset],
+        [glass.widthAnchor constraintEqualToConstant:kSidebarWidth - kSidebarInset],
         [icon.widthAnchor constraintEqualToConstant:36],
         [icon.heightAnchor constraintEqualToConstant:36],
-        [header.topAnchor constraintEqualToAnchor:sidebar.topAnchor constant:48],
+        [header.topAnchor constraintEqualToAnchor:sidebar.topAnchor constant:40],
         [header.leadingAnchor constraintEqualToAnchor:sidebar.leadingAnchor constant:16],
         [header.trailingAnchor constraintLessThanOrEqualToAnchor:sidebar.trailingAnchor constant:-12],
         [nav.topAnchor constraintEqualToAnchor:header.bottomAnchor constant:22],
@@ -311,7 +307,7 @@ static const CGFloat kFooterHeight = 60;
     pageScrollView = scroll;
     
     [NSLayoutConstraint activateConstraints:@[
-        [scroll.leadingAnchor constraintEqualToAnchor:root.leadingAnchor constant:kSidebarWidth + 1],
+        [scroll.leadingAnchor constraintEqualToAnchor:root.leadingAnchor constant:kSidebarWidth],
         [scroll.trailingAnchor constraintEqualToAnchor:root.trailingAnchor],
         [scroll.topAnchor constraintEqualToAnchor:root.topAnchor],
         [scroll.bottomAnchor constraintEqualToAnchor:footerView.topAnchor],
@@ -385,7 +381,7 @@ static const CGFloat kFooterHeight = 60;
     NSBox* card = [[NSBox alloc] init];
     card.boxType = NSBoxCustom;
     card.titlePosition = NSNoTitle;
-    card.cornerRadius = 10;
+    card.cornerRadius = 14;
     card.borderWidth = 1;
     card.borderColor = [NSColor separatorColor];
     card.fillColor = [NSColor controlBackgroundColor];

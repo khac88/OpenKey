@@ -2,8 +2,8 @@
 Vì một số lý do mà OpenKey không thể đưa lêp Mac App Store được, nếu các bạn không yên tâm về file build chính thức từ tác giả, các bạn có thể tải mã nguồn về tự build lấy OpenKey cho mình. 
 
 Yêu cầu:
-- macOS 13 Ventura trở lên (cả máy build lẫn máy chạy OpenKey).
-- Xcode 15 trở lên.
+- macOS 26 Tahoe trở lên (cả máy build lẫn máy chạy OpenKey).
+- Xcode 26 trở lên (cần SDK macOS 26 cho giao diện Liquid Glass).
 
 Tải mã nguồn từ dự án OpenKey trên GitHub về, mở dự án OpenKey bằng cách vào:
 <img width="808" alt="Screen Shot 2022-06-01 at 13 34 39" src="https://user-images.githubusercontent.com/7700801/171342552-46c391a7-9160-4677-bb8a-9d8cececcfe6.png">
