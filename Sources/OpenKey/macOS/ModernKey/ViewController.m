@@ -10,6 +10,7 @@
 #import "OpenKeyManager.h"
 #import "AppDelegate.h"
 #import "MyTextField.h"
+#import <ApplicationServices/ApplicationServices.h>
 
 extern AppDelegate* appDelegate;
 extern void OnSpellCheckingChanged(void);
@@ -41,62 +42,70 @@ extern int vAutoCapsMacro;
 extern int vFixChromiumBrowser;
 extern int vPerformLayoutCompat;
 
+static const CGFloat kPanelWidth = 780;
+static const CGFloat kPanelHeight = 640;
+static const CGFloat kSidebarWidth = 200;
+static const CGFloat kFooterHeight = 60;
+
+// Flipped container so that a page starts at the top of its scroll view.
+@interface OKFlippedView : NSView
+@end
+
+@implementation OKFlippedView
+- (BOOL)isFlipped {
+    return YES;
+}
+@end
+
 @implementation ViewController {
-    __weak IBOutlet NSButton *CustomSwitchCommand;
-    __weak IBOutlet NSButton *CustomSwitchOption;
-    __weak IBOutlet NSButton *CustomSwitchControl;
-    __weak IBOutlet NSButton *CustomSwitchShift;
-    __weak IBOutlet MyTextField *CustomSwitchKey;
-    __weak IBOutlet NSButton *CustomBeepSound;
-    NSArray* tabviews, *tabbuttons;
-    NSRect tabViewRect;
+    __weak NSButton *CustomSwitchCommand;
+    __weak NSButton *CustomSwitchOption;
+    __weak NSButton *CustomSwitchControl;
+    __weak NSButton *CustomSwitchShift;
+    __weak MyTextField *CustomSwitchKey;
+    __weak NSSwitch *CustomBeepSound;
+    NSArray<NSView*>* pages;
+    NSArray<NSView*>* navItems;
+    NSArray<NSButton*>* navButtons;
+    NSScrollView* pageScrollView;
+    NSView* footerView;
+    NSView* statusDot;
+    NSTextField* statusLabel;
+}
+
+#pragma mark - Building the panel
+
+- (void)loadView {
+    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, kPanelWidth, kPanelHeight)];
+    [self buildFooter];
+    [self buildSidebar];
+    [self buildPages];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     viewController = self;
-    CustomSwitchKey.Parent = self;
     
-    self.appOK.hidden = YES;
-    self.permissionWarning.hidden = YES;
-    self.retryButton.enabled = NO;
- 
-    NSRect parentRect = self.viewParent.frame;
-    parentRect.size.height = 490;
-    self.viewParent.frame = parentRect;
-    
-    //set correct tabgroup (the Info tab is replaced by the sidebar and the footer)
-    tabviews = [NSArray arrayWithObjects:self.tabviewPrimary, self.tabviewMacro, self.tabviewSystem, nil];
-    tabbuttons = [NSArray arrayWithObjects:self.tabbuttonPrimary, self.tabbuttonMacro, self.tabbuttonSystem, nil];
-    tabViewRect = self.tabviewPrimary.frame;
-    for (NSBox* b in tabviews) {
-        b.frame = tabViewRect;
-    }
-    self.tabviewInfo.hidden = YES;
-    self.tabbuttonInfo.hidden = YES;
-
-    [self applyModernLayout];
-    [self showTab:0];
-    
-    NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex 1", @"Simple Telex 2", nil];
-    NSArray* codeData = [OpenKeyManager getTableCodes];
-    
-    //preset data
-    [_popupInputType removeAllItems];
-    [_popupInputType addItemsWithTitles:inputTypeData];
+    NSArray* inputTypeData = @[@"Telex", @"VNI", @"Simple Telex 1", @"Simple Telex 2"];
+    [self.popupInputType removeAllItems];
+    [self.popupInputType addItemsWithTitles:inputTypeData];
     
     [self.popupCode removeAllItems];
-    [self.popupCode addItemsWithTitles:codeData];
+    [self.popupCode addItemsWithTitles:[OpenKeyManager getTableCodes]];
     
+    [self showPage:0];
     [self initKey];
-    
     [self fillData];
-    
-    // set version info
-    self.VersionInfo.stringValue = [NSString stringWithFormat:@"Phiên bản %@ (build %@) - Ngày cập nhật %@",
-    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
-    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"],
-    [OpenKeyManager getBuildDate]] ;
+}
+
+- (void)viewWillAppear {
+    [super viewWillAppear];
+    NSWindow* window = self.view.window;
+    window.titleVisibility = NSWindowTitleHidden;
+    window.titlebarAppearsTransparent = YES;
+    window.styleMask |= NSWindowStyleMaskFullSizeContentView;
+    [self initKey];
+    [self updateStatus];
 }
 
 - (void)viewDidAppear {
@@ -105,101 +114,47 @@ extern int vPerformLayoutCompat;
     self.view.window.title = [NSString stringWithFormat:str, [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"]];
 }
 
-- (void)viewWillAppear {
-    [self initKey];
-}
-
 -(void)initKey {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![OpenKeyManager initEventTap]) {
-            //self.permissionWarning.hidden = NO;
-            //self.retryButton.enabled = YES;
-        } else {
-            //self.appOK.hidden = NO;
-        }
+        [OpenKeyManager initEventTap];
     });
 }
 
-- (void)setRepresentedObject:(id)representedObject {
-    [super setRepresentedObject:representedObject];
-
-    // Update the view, if already loaded.
+-(void)updateStatus {
+    BOOL trusted = AXIsProcessTrusted();
+    statusDot.layer.backgroundColor = (trusted ? [NSColor systemGreenColor] : [NSColor systemOrangeColor]).CGColor;
+    statusLabel.stringValue = trusted ? @"Đang hoạt động" : @"Chưa được cấp quyền Trợ năng";
 }
 
--(void)applyModernLayout {
-    const CGFloat sidebarWidth = 180;
-    const CGFloat footerHeight = 56;
+-(NSTextField*)labelWithString:(NSString*)string size:(CGFloat)size weight:(NSFontWeight)weight secondary:(BOOL)secondary {
+    NSTextField* label = [NSTextField labelWithString:string];
+    label.font = [NSFont systemFontOfSize:size weight:weight];
+    if (secondary)
+        label.textColor = [NSColor secondaryLabelColor];
+    label.translatesAutoresizingMaskIntoConstraints = NO;
+    return label;
+}
+
+-(NSBox*)separator {
+    NSBox* line = [[NSBox alloc] init];
+    line.boxType = NSBoxSeparator;
+    line.translatesAutoresizingMaskIntoConstraints = NO;
+    return line;
+}
+
+-(void)buildFooter {
     NSView* root = self.view;
-
-    //make room for the sidebar (left) and the footer (bottom)
-    BOOL autoresizes = root.autoresizesSubviews;
-    root.autoresizesSubviews = NO;
-    for (NSView* v in root.subviews) {
-        [v setFrameOrigin:NSMakePoint(v.frame.origin.x + sidebarWidth, v.frame.origin.y + footerHeight)];
-    }
-    tabViewRect = NSOffsetRect(tabViewRect, sidebarWidth, footerHeight);
-    NSRect rootFrame = root.frame;
-    rootFrame.size.width += sidebarWidth;
-    rootFrame.size.height += footerHeight;
-    root.frame = rootFrame;
-    root.autoresizesSubviews = autoresizes;
-    CGFloat width = rootFrame.size.width;
-    CGFloat height = rootFrame.size.height;
-
-    //sidebar
-    NSVisualEffectView* sidebar = [[NSVisualEffectView alloc] initWithFrame:NSMakeRect(0, footerHeight, sidebarWidth, height - footerHeight)];
-    sidebar.material = NSVisualEffectMaterialSidebar;
-    sidebar.blendingMode = NSVisualEffectBlendingModeBehindWindow;
-    sidebar.state = NSVisualEffectStateFollowsWindowActiveState;
-    sidebar.autoresizingMask = NSViewHeightSizable | NSViewMaxXMargin;
-    [root addSubview:sidebar positioned:NSWindowBelow relativeTo:nil];
-
-    NSImageView* icon = [NSImageView imageViewWithImage:[NSApp applicationIconImage]];
-    icon.frame = NSMakeRect(16, height - 60, 40, 40);
-    [root addSubview:icon];
-
-    NSTextField* appName = [NSTextField labelWithString:@"OpenKey"];
-    appName.font = [NSFont boldSystemFontOfSize:15];
-    appName.frame = NSMakeRect(62, height - 40, sidebarWidth - 70, 20);
-    [root addSubview:appName];
-
-    NSTextField* version = [NSTextField labelWithString:[NSString stringWithFormat:@"Phiên bản %@",
-                                                         [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"]]];
-    version.font = [NSFont systemFontOfSize:11];
-    version.textColor = [NSColor secondaryLabelColor];
-    version.frame = NSMakeRect(62, height - 57, sidebarWidth - 70, 16);
-    [root addSubview:version];
-
-    //the tab buttons become the sidebar navigation
-    CGFloat y = height - 108;
-    for (NSButton* b in tabbuttons) {
-        [b setButtonType:NSButtonTypePushOnPushOff];
-        b.bezelStyle = NSBezelStyleRecessed;
-        b.showsBorderOnlyWhileMouseInside = YES;
-        b.alignment = NSTextAlignmentLeft;
-        b.font = [NSFont systemFontOfSize:13];
-        b.frame = NSMakeRect(12, y, sidebarWidth - 24, 28);
-        y -= 34;
-    }
-
-    NSButton* checkButton = [NSButton buttonWithTitle:@"Kiểm tra bản mới..." target:self action:@selector(onCheckNewVersionButton:)];
-    checkButton.frame = NSMakeRect(12, footerHeight + 12, sidebarWidth - 24, 32);
-    [root addSubview:checkButton];
-    self.CheckNewVersionButton = checkButton;
-
-    //footer: credit and license notice
-    NSBox* separator = [[NSBox alloc] initWithFrame:NSMakeRect(0, footerHeight - 1, width, 1)];
-    separator.boxType = NSBoxSeparator;
-    separator.autoresizingMask = NSViewWidthSizable;
-    [root addSubview:separator];
-
+    NSView* footer = [[NSView alloc] init];
+    footer.translatesAutoresizingMaskIntoConstraints = NO;
+    [root addSubview:footer];
+    footerView = footer;
+    
+    NSBox* line = [self separator];
+    [footer addSubview:line];
+    
+    NSTextField* credit = [self labelWithString:@"OpenKey – dựa trên mã nguồn của Mai Vũ Tuyên © 2019" size:11 weight:NSFontWeightRegular secondary:YES];
+    
     NSFont* footerFont = [NSFont systemFontOfSize:11];
-    NSTextField* credit = [NSTextField labelWithString:@"OpenKey – dựa trên mã nguồn của Mai Vũ Tuyên © 2019"];
-    credit.font = footerFont;
-    credit.textColor = [NSColor secondaryLabelColor];
-    credit.frame = NSMakeRect(20, 30, width - 40, 16);
-    [root addSubview:credit];
-
     NSMutableAttributedString* license = [[NSMutableAttributedString alloc] initWithString:@"Phát hành theo giấy phép GPL-3.0 · Mã nguồn: "
                                                                                 attributes:@{NSFontAttributeName: footerFont,
                                                                                              NSForegroundColorAttributeName: [NSColor secondaryLabelColor]}];
@@ -209,31 +164,473 @@ extern int vPerformLayoutCompat;
     NSTextField* licenseLabel = [NSTextField labelWithAttributedString:license];
     licenseLabel.selectable = YES;
     licenseLabel.allowsEditingTextAttributes = YES;
-    licenseLabel.frame = NSMakeRect(20, 12, width - 40, 16);
-    [root addSubview:licenseLabel];
-}
-
--(void)showTab:(NSInteger)index {
-    NSRect tempRect = tabViewRect;
-    tempRect.origin.y = 1000;
-    for (NSBox* b in tabviews) {
-        [b setHidden:YES];
-        b.frame = tempRect;
-    }
-    for (NSButton* b in tabbuttons) {
-        [b setState:NSControlStateValueOff];
-    }
-    NSBox* b = [tabviews objectAtIndex:index];
-    [b setHidden:NO];
-    b.frame = tabViewRect;
     
-    NSButton* button = [tabbuttons objectAtIndex:index];
-    [button setState:NSControlStateValueOn];
+    NSStackView* texts = [NSStackView stackViewWithViews:@[credit, licenseLabel]];
+    texts.orientation = NSUserInterfaceLayoutOrientationVertical;
+    texts.alignment = NSLayoutAttributeLeading;
+    texts.spacing = 3;
+    texts.translatesAutoresizingMaskIntoConstraints = NO;
+    [footer addSubview:texts];
+    
+    NSButton* defaultButton = [NSButton buttonWithTitle:@"Khôi phục mặc định" target:self action:@selector(onDefaultConfig:)];
+    NSButton* quitButton = [NSButton buttonWithTitle:@"Thoát OpenKey" target:self action:@selector(onTerminateApp:)];
+    NSStackView* buttons = [NSStackView stackViewWithViews:@[defaultButton, quitButton]];
+    buttons.spacing = 8;
+    buttons.translatesAutoresizingMaskIntoConstraints = NO;
+    [footer addSubview:buttons];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [footer.leadingAnchor constraintEqualToAnchor:root.leadingAnchor],
+        [footer.trailingAnchor constraintEqualToAnchor:root.trailingAnchor],
+        [footer.bottomAnchor constraintEqualToAnchor:root.bottomAnchor],
+        [footer.heightAnchor constraintEqualToConstant:kFooterHeight],
+        [line.topAnchor constraintEqualToAnchor:footer.topAnchor],
+        [line.leadingAnchor constraintEqualToAnchor:footer.leadingAnchor],
+        [line.trailingAnchor constraintEqualToAnchor:footer.trailingAnchor],
+        [texts.leadingAnchor constraintEqualToAnchor:footer.leadingAnchor constant:20],
+        [texts.centerYAnchor constraintEqualToAnchor:footer.centerYAnchor],
+        [buttons.trailingAnchor constraintEqualToAnchor:footer.trailingAnchor constant:-20],
+        [buttons.centerYAnchor constraintEqualToAnchor:footer.centerYAnchor],
+        [buttons.leadingAnchor constraintGreaterThanOrEqualToAnchor:texts.trailingAnchor constant:16],
+    ]];
 }
 
-- (IBAction)onTabButton:(NSButton *)sender {
-    [self showTab:sender.tag];
+-(void)buildSidebar {
+    NSView* root = self.view;
+    NSVisualEffectView* sidebar = [[NSVisualEffectView alloc] init];
+    sidebar.material = NSVisualEffectMaterialSidebar;
+    sidebar.blendingMode = NSVisualEffectBlendingModeBehindWindow;
+    sidebar.state = NSVisualEffectStateFollowsWindowActiveState;
+    sidebar.translatesAutoresizingMaskIntoConstraints = NO;
+    [root addSubview:sidebar];
+    
+    //app title
+    NSImageView* icon = [NSImageView imageViewWithImage:[NSApp applicationIconImage]];
+    icon.translatesAutoresizingMaskIntoConstraints = NO;
+    NSTextField* name = [self labelWithString:@"OpenKey" size:15 weight:NSFontWeightSemibold secondary:NO];
+    NSTextField* subtitle = [self labelWithString:@"Bộ gõ Tiếng Việt" size:11 weight:NSFontWeightRegular secondary:YES];
+    NSStackView* titleTexts = [NSStackView stackViewWithViews:@[name, subtitle]];
+    titleTexts.orientation = NSUserInterfaceLayoutOrientationVertical;
+    titleTexts.alignment = NSLayoutAttributeLeading;
+    titleTexts.spacing = 1;
+    NSStackView* header = [NSStackView stackViewWithViews:@[icon, titleTexts]];
+    header.spacing = 10;
+    header.translatesAutoresizingMaskIntoConstraints = NO;
+    [sidebar addSubview:header];
+    
+    //navigation
+    NSArray* navData = @[@[@"Bộ gõ", @"keyboard"], @[@"Gõ tắt", @"bolt"], @[@"Hệ thống", @"gearshape"]];
+    NSMutableArray* items = [NSMutableArray array];
+    NSMutableArray* buttons = [NSMutableArray array];
+    NSStackView* nav = [[NSStackView alloc] init];
+    nav.orientation = NSUserInterfaceLayoutOrientationVertical;
+    nav.alignment = NSLayoutAttributeLeading;
+    nav.spacing = 2;
+    nav.translatesAutoresizingMaskIntoConstraints = NO;
+    [sidebar addSubview:nav];
+    for (NSInteger i = 0; i < navData.count; i++) {
+        NSImage* image = [NSImage imageWithSystemSymbolName:navData[i][1] accessibilityDescription:nil];
+        NSButton* button = [NSButton buttonWithTitle:navData[i][0] image:image target:self action:@selector(onNavButton:)];
+        button.bordered = NO;
+        button.imagePosition = NSImageLeading;
+        button.imageHugsTitle = YES;
+        button.alignment = NSTextAlignmentLeft;
+        button.font = [NSFont systemFontOfSize:13 weight:NSFontWeightMedium];
+        button.tag = i;
+        button.translatesAutoresizingMaskIntoConstraints = NO;
+        
+        NSView* item = [[NSView alloc] init];
+        item.wantsLayer = YES;
+        item.layer.cornerRadius = 7;
+        item.translatesAutoresizingMaskIntoConstraints = NO;
+        [item addSubview:button];
+        [nav addArrangedSubview:item];
+        [NSLayoutConstraint activateConstraints:@[
+            [item.widthAnchor constraintEqualToAnchor:nav.widthAnchor],
+            [item.heightAnchor constraintEqualToConstant:32],
+            [button.leadingAnchor constraintEqualToAnchor:item.leadingAnchor constant:10],
+            [button.trailingAnchor constraintEqualToAnchor:item.trailingAnchor],
+            [button.topAnchor constraintEqualToAnchor:item.topAnchor],
+            [button.bottomAnchor constraintEqualToAnchor:item.bottomAnchor],
+        ]];
+        [items addObject:item];
+        [buttons addObject:button];
+    }
+    navItems = items;
+    navButtons = buttons;
+    
+    //accessibility permission status
+    NSView* dot = [[NSView alloc] init];
+    dot.wantsLayer = YES;
+    dot.layer.cornerRadius = 4;
+    dot.translatesAutoresizingMaskIntoConstraints = NO;
+    statusDot = dot;
+    statusLabel = [self labelWithString:@"" size:12 weight:NSFontWeightRegular secondary:NO];
+    NSStackView* status = [NSStackView stackViewWithViews:@[dot, statusLabel]];
+    status.spacing = 8;
+    status.translatesAutoresizingMaskIntoConstraints = NO;
+    [sidebar addSubview:status];
+    
+    NSBox* line = [self separator];
+    [root addSubview:line];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [sidebar.leadingAnchor constraintEqualToAnchor:root.leadingAnchor],
+        [sidebar.topAnchor constraintEqualToAnchor:root.topAnchor],
+        [sidebar.bottomAnchor constraintEqualToAnchor:footerView.topAnchor],
+        [sidebar.widthAnchor constraintEqualToConstant:kSidebarWidth],
+        [line.topAnchor constraintEqualToAnchor:sidebar.topAnchor],
+        [line.bottomAnchor constraintEqualToAnchor:sidebar.bottomAnchor],
+        [line.leadingAnchor constraintEqualToAnchor:sidebar.trailingAnchor],
+        [line.widthAnchor constraintEqualToConstant:1],
+        [icon.widthAnchor constraintEqualToConstant:36],
+        [icon.heightAnchor constraintEqualToConstant:36],
+        [header.topAnchor constraintEqualToAnchor:sidebar.topAnchor constant:48],
+        [header.leadingAnchor constraintEqualToAnchor:sidebar.leadingAnchor constant:16],
+        [header.trailingAnchor constraintLessThanOrEqualToAnchor:sidebar.trailingAnchor constant:-12],
+        [nav.topAnchor constraintEqualToAnchor:header.bottomAnchor constant:22],
+        [nav.leadingAnchor constraintEqualToAnchor:sidebar.leadingAnchor constant:10],
+        [nav.trailingAnchor constraintEqualToAnchor:sidebar.trailingAnchor constant:-10],
+        [dot.widthAnchor constraintEqualToConstant:8],
+        [dot.heightAnchor constraintEqualToConstant:8],
+        [status.leadingAnchor constraintEqualToAnchor:sidebar.leadingAnchor constant:18],
+        [status.trailingAnchor constraintLessThanOrEqualToAnchor:sidebar.trailingAnchor constant:-12],
+        [status.bottomAnchor constraintEqualToAnchor:sidebar.bottomAnchor constant:-16],
+    ]];
 }
+
+-(void)buildPages {
+    NSView* root = self.view;
+    NSScrollView* scroll = [[NSScrollView alloc] init];
+    scroll.hasVerticalScroller = YES;
+    scroll.autohidesScrollers = YES;
+    scroll.drawsBackground = NO;
+    scroll.borderType = NSNoBorder;
+    scroll.translatesAutoresizingMaskIntoConstraints = NO;
+    [root addSubview:scroll];
+    pageScrollView = scroll;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [scroll.leadingAnchor constraintEqualToAnchor:root.leadingAnchor constant:kSidebarWidth + 1],
+        [scroll.trailingAnchor constraintEqualToAnchor:root.trailingAnchor],
+        [scroll.topAnchor constraintEqualToAnchor:root.topAnchor],
+        [scroll.bottomAnchor constraintEqualToAnchor:footerView.topAnchor],
+    ]];
+    
+    pages = @[[self buildInputPage], [self buildMacroPage], [self buildSystemPage]];
+}
+
+-(void)showPage:(NSInteger)index {
+    NSView* page = pages[index];
+    NSClipView* clip = pageScrollView.contentView;
+    pageScrollView.documentView = page;
+    [NSLayoutConstraint activateConstraints:@[
+        [page.leadingAnchor constraintEqualToAnchor:clip.leadingAnchor],
+        [page.trailingAnchor constraintEqualToAnchor:clip.trailingAnchor],
+        [page.topAnchor constraintEqualToAnchor:clip.topAnchor],
+    ]];
+    [clip scrollToPoint:NSZeroPoint];
+    [pageScrollView reflectScrolledClipView:clip];
+    
+    for (NSInteger i = 0; i < navItems.count; i++) {
+        BOOL selected = (i == index);
+        navItems[i].layer.backgroundColor = selected ? [NSColor controlAccentColor].CGColor : [NSColor clearColor].CGColor;
+        navButtons[i].contentTintColor = selected ? [NSColor whiteColor] : [NSColor labelColor];
+    }
+}
+
+- (IBAction)onNavButton:(NSButton *)sender {
+    [self showPage:sender.tag];
+}
+
+-(NSView*)pageWithTitle:(NSString*)title subtitle:(NSString*)subtitle sections:(NSArray<NSView*>*)sections {
+    OKFlippedView* page = [[OKFlippedView alloc] init];
+    page.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    NSTextField* heading = [self labelWithString:title size:20 weight:NSFontWeightSemibold secondary:NO];
+    NSTextField* sub = [self labelWithString:subtitle size:13 weight:NSFontWeightRegular secondary:YES];
+    NSStackView* stack = [NSStackView stackViewWithViews:@[heading, sub]];
+    stack.orientation = NSUserInterfaceLayoutOrientationVertical;
+    stack.alignment = NSLayoutAttributeLeading;
+    stack.spacing = 20;
+    [stack setCustomSpacing:4 afterView:heading];
+    stack.translatesAutoresizingMaskIntoConstraints = NO;
+    [page addSubview:stack];
+    for (NSView* section in sections) {
+        [stack addArrangedSubview:section];
+        [section.widthAnchor constraintEqualToAnchor:stack.widthAnchor].active = YES;
+    }
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [stack.leadingAnchor constraintEqualToAnchor:page.leadingAnchor constant:28],
+        [stack.trailingAnchor constraintEqualToAnchor:page.trailingAnchor constant:-28],
+        [stack.topAnchor constraintEqualToAnchor:page.topAnchor constant:40],
+        [stack.bottomAnchor constraintEqualToAnchor:page.bottomAnchor constant:-28],
+    ]];
+    return page;
+}
+
+-(NSView*)sectionWithTitle:(NSString*)title rows:(NSArray<NSView*>*)rows {
+    NSStackView* section = [[NSStackView alloc] init];
+    section.orientation = NSUserInterfaceLayoutOrientationVertical;
+    section.alignment = NSLayoutAttributeLeading;
+    section.spacing = 8;
+    section.translatesAutoresizingMaskIntoConstraints = NO;
+    if (title) {
+        NSTextField* label = [self labelWithString:title size:12 weight:NSFontWeightSemibold secondary:YES];
+        [section addArrangedSubview:label];
+        [section setCustomSpacing:6 afterView:label];
+    }
+    
+    NSBox* card = [[NSBox alloc] init];
+    card.boxType = NSBoxCustom;
+    card.titlePosition = NSNoTitle;
+    card.cornerRadius = 10;
+    card.borderWidth = 1;
+    card.borderColor = [NSColor separatorColor];
+    card.fillColor = [NSColor controlBackgroundColor];
+    card.contentViewMargins = NSZeroSize;
+    card.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    NSStackView* list = [[NSStackView alloc] init];
+    list.orientation = NSUserInterfaceLayoutOrientationVertical;
+    list.alignment = NSLayoutAttributeLeading;
+    list.spacing = 0;
+    list.translatesAutoresizingMaskIntoConstraints = NO;
+    for (NSInteger i = 0; i < rows.count; i++) {
+        if (i > 0) {
+            NSBox* line = [self separator];
+            [list addArrangedSubview:line];
+            [line.widthAnchor constraintEqualToAnchor:list.widthAnchor constant:-28].active = YES;
+        }
+        [list addArrangedSubview:rows[i]];
+        [rows[i].widthAnchor constraintEqualToAnchor:list.widthAnchor].active = YES;
+    }
+    list.alignment = NSLayoutAttributeCenterX;
+    [card.contentView addSubview:list];
+    [section addArrangedSubview:card];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [list.leadingAnchor constraintEqualToAnchor:card.contentView.leadingAnchor],
+        [list.trailingAnchor constraintEqualToAnchor:card.contentView.trailingAnchor],
+        [list.topAnchor constraintEqualToAnchor:card.contentView.topAnchor],
+        [list.bottomAnchor constraintEqualToAnchor:card.contentView.bottomAnchor],
+        [card.widthAnchor constraintEqualToAnchor:section.widthAnchor],
+    ]];
+    return section;
+}
+
+-(NSView*)rowWithTitle:(NSString*)title hint:(NSString*)hint control:(NSView*)control {
+    NSView* row = [[NSView alloc] init];
+    row.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    NSTextField* titleLabel = [self labelWithString:title size:13 weight:NSFontWeightRegular secondary:NO];
+    NSStackView* texts = [NSStackView stackViewWithViews:@[titleLabel]];
+    texts.orientation = NSUserInterfaceLayoutOrientationVertical;
+    texts.alignment = NSLayoutAttributeLeading;
+    texts.spacing = 2;
+    texts.translatesAutoresizingMaskIntoConstraints = NO;
+    if (hint) {
+        NSTextField* hintLabel = [NSTextField wrappingLabelWithString:hint];
+        hintLabel.font = [NSFont systemFontOfSize:11];
+        hintLabel.textColor = [NSColor secondaryLabelColor];
+        hintLabel.preferredMaxLayoutWidth = 340;
+        [texts addArrangedSubview:hintLabel];
+    }
+    [row addSubview:texts];
+    
+    control.translatesAutoresizingMaskIntoConstraints = NO;
+    [control setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [control setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [row addSubview:control];
+    
+    NSLayoutConstraint* compact = [row.heightAnchor constraintEqualToConstant:44];
+    compact.priority = NSLayoutPriorityDefaultLow;
+    [NSLayoutConstraint activateConstraints:@[
+        compact,
+        [row.heightAnchor constraintGreaterThanOrEqualToConstant:44],
+        [row.heightAnchor constraintGreaterThanOrEqualToAnchor:texts.heightAnchor constant:20],
+        [row.heightAnchor constraintGreaterThanOrEqualToAnchor:control.heightAnchor constant:16],
+        [texts.leadingAnchor constraintEqualToAnchor:row.leadingAnchor constant:14],
+        [texts.centerYAnchor constraintEqualToAnchor:row.centerYAnchor],
+        [control.trailingAnchor constraintEqualToAnchor:row.trailingAnchor constant:-14],
+        [control.centerYAnchor constraintEqualToAnchor:row.centerYAnchor],
+        [control.leadingAnchor constraintGreaterThanOrEqualToAnchor:texts.trailingAnchor constant:16],
+    ]];
+    return row;
+}
+
+-(NSSwitch*)switchWithAction:(SEL)action {
+    NSSwitch* control = [[NSSwitch alloc] init];
+    control.target = self;
+    control.action = action;
+    return control;
+}
+
+-(NSPopUpButton*)popupWithAction:(SEL)action {
+    NSPopUpButton* popup = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
+    popup.target = self;
+    popup.action = action;
+    [popup.widthAnchor constraintEqualToConstant:190].active = YES;
+    return popup;
+}
+
+-(NSButton*)modifierKeyButton:(NSString*)symbol toolTip:(NSString*)toolTip action:(SEL)action {
+    NSButton* button = [NSButton buttonWithTitle:symbol target:self action:action];
+    [button setButtonType:NSButtonTypePushOnPushOff];
+    button.bezelStyle = NSBezelStyleRounded;
+    button.toolTip = toolTip;
+    button.font = [NSFont systemFontOfSize:14];
+    [button.widthAnchor constraintEqualToConstant:40].active = YES;
+    return button;
+}
+
+-(NSView*)buildInputPage {
+    NSSegmentedControl* method = [NSSegmentedControl segmentedControlWithLabels:@[@"Tiếng Việt", @"English"]
+                                                                   trackingMode:NSSegmentSwitchTrackingSelectOne
+                                                                         target:self
+                                                                         action:@selector(onLanguageChanged:)];
+    self.inputMethodControl = method;
+    NSPopUpButton* inputType = [self popupWithAction:@selector(onInputTypeChanged:)];
+    self.popupInputType = inputType;
+    NSPopUpButton* code = [self popupWithAction:@selector(onCodeTableChanged:)];
+    self.popupCode = code;
+    
+    NSButton* control = [self modifierKeyButton:@"⌃" toolTip:@"Phím Control" action:@selector(onControlSwitchKey:)];
+    NSButton* option = [self modifierKeyButton:@"⌥" toolTip:@"Phím Option" action:@selector(onOptionSwitchKey:)];
+    NSButton* command = [self modifierKeyButton:@"⌘" toolTip:@"Phím Command" action:@selector(onCommandSwitchKey:)];
+    NSButton* shift = [self modifierKeyButton:@"⇧" toolTip:@"Phím Shift" action:@selector(onShiftSwitchKey:)];
+    CustomSwitchControl = control;
+    CustomSwitchOption = option;
+    CustomSwitchCommand = command;
+    CustomSwitchShift = shift;
+    NSTextField* plus = [self labelWithString:@"+" size:13 weight:NSFontWeightRegular secondary:YES];
+    MyTextField* key = [[MyTextField alloc] init];
+    key.alignment = NSTextAlignmentCenter;
+    key.usesSingleLineMode = YES;
+    key.toolTip = @"Nhập ký tự vào đây";
+    key.Parent = self;
+    [key.widthAnchor constraintEqualToConstant:56].active = YES;
+    CustomSwitchKey = key;
+    NSStackView* switchKey = [NSStackView stackViewWithViews:@[control, option, command, shift, plus, key]];
+    switchKey.spacing = 6;
+    
+    NSSwitch* beep = [self switchWithAction:@selector(onBeepSound:)];
+    CustomBeepSound = beep;
+    
+    NSView* general = [self sectionWithTitle:nil rows:@[
+        [self rowWithTitle:@"Chế độ gõ" hint:nil control:method],
+        [self rowWithTitle:@"Kiểu gõ" hint:nil control:inputType],
+        [self rowWithTitle:@"Bảng mã" hint:nil control:code],
+        [self rowWithTitle:@"Phím chuyển Việt / Anh" hint:@"Bấm để chọn tổ hợp phím" control:switchKey],
+        [self rowWithTitle:@"Kêu beep khi chuyển chế độ" hint:@"Không áp dụng khi chuyển chế độ thông minh" control:beep],
+    ]];
+    
+    NSSwitch* s;
+    NSMutableArray* spelling = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onModernOrthography:)]; self.UseModernOrthography = s;
+    [spelling addObject:[self rowWithTitle:@"Đặt dấu kiểu mới" hint:@"oà, uý thay vì òa, úy" control:s]];
+    s = [self switchWithAction:@selector(onCheckSpelling:)]; self.CheckSpellingButton = s;
+    [spelling addObject:[self rowWithTitle:@"Kiểm tra chính tả" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onRestoreIfInvalidWord:)]; self.RestoreIfInvalidWord = s;
+    [spelling addObject:[self rowWithTitle:@"Tự khôi phục phím khi gõ sai từ" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onAllowZFWJ:)]; self.AllowZWJF = s;
+    [spelling addObject:[self rowWithTitle:@"Cho phép “z w j f” làm phụ âm" hint:nil control:s]];
+    s = [self switchWithAction:@selector(omTempOffSpellChecking:)]; self.TempOffSpellChecking = s;
+    [spelling addObject:[self rowWithTitle:@"Tạm tắt chính tả bằng phím ⌃" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onIgnoreStandaloneW:)]; self.IgnoreStandaloneW = s;
+    [spelling addObject:[self rowWithTitle:@"Bỏ qua W đầu từ" hint:@"Không tự thành Ư" control:s]];
+    
+    NSMutableArray* smart = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onAutoRememberSwitchKey:)]; self.AutoRememberSwitchKey = s;
+    [smart addObject:[self rowWithTitle:@"Chuyển chế độ thông minh" hint:@"Nhớ Việt / Anh cho từng ứng dụng" control:s]];
+    s = [self switchWithAction:@selector(onRememberTableCode:)]; self.RememberTableCode = s;
+    [smart addObject:[self rowWithTitle:@"Tự ghi nhớ bảng mã theo ứng dụng" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onAutoRestoreEnglish:)]; self.AutoRestoreEnglish = s;
+    [smart addObject:[self rowWithTitle:@"Tự khôi phục từ tiếng Anh bị lỗi Telex" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onUpperCaseFirstChar:)]; self.UpperCaseFirstChar = s;
+    [smart addObject:[self rowWithTitle:@"Viết hoa chữ cái đầu câu" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onFixRecommendBrowser:)]; self.FixRecommendBrowser = s;
+    [smart addObject:[self rowWithTitle:@"Sửa lỗi gợi ý" hint:@"Trình duyệt, Excel…" control:s]];
+    s = [self switchWithAction:@selector(onTempOffOpenKeyByHotKey:)]; self.TempOffOpenKey = s;
+    [smart addObject:[self rowWithTitle:@"Tạm tắt OpenKey bằng phím ⌘" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onOtherLanguage:)]; self.OtherLanguage = s;
+    [smart addObject:[self rowWithTitle:@"Tắt tiếng Việt khi bộ gõ hệ thống không phải tiếng Anh" hint:nil control:s]];
+    
+    return [self pageWithTitle:@"Bộ gõ" subtitle:@"Kiểu gõ, bảng mã và cách bỏ dấu." sections:@[
+        general,
+        [self sectionWithTitle:@"DẤU VÀ CHÍNH TẢ" rows:spelling],
+        [self sectionWithTitle:@"THÔNG MINH" rows:smart],
+    ]];
+}
+
+-(NSView*)buildMacroPage {
+    NSSwitch* s;
+    NSMutableArray* macro = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onMacroChanged:)]; self.UseMacro = s;
+    [macro addObject:[self rowWithTitle:@"Cho phép gõ tắt" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onUseMacroInEnglishModeChanged:)]; self.UseMacroInEnglishMode = s;
+    [macro addObject:[self rowWithTitle:@"Gõ tắt cả khi đang tắt tiếng Việt" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onAutoCapsMacro:)]; self.AutoCapsMacro = s;
+    [macro addObject:[self rowWithTitle:@"Tự động viết hoa theo từ gõ tắt" hint:nil control:s]];
+    NSButton* table = [NSButton buttonWithTitle:@"Mở bảng gõ tắt..." target:self action:@selector(onMacroButton:)];
+    [macro addObject:[self rowWithTitle:@"Bảng gõ tắt" hint:@"Thêm, sửa, nạp hoặc xuất danh sách từ gõ tắt" control:table]];
+    
+    NSMutableArray* quick = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onQuickTelex:)]; self.QuickTelex = s;
+    [quick addObject:[self rowWithTitle:@"Gõ nhanh phụ âm kép" hint:@"cc→ch, gg→gi, kk→kh, nn→ng, qq→qu, pp→ph, tt→th" control:s]];
+    s = [self switchWithAction:@selector(onQuickStartConsonant:)]; self.QuickStartConsonant = s;
+    [quick addObject:[self rowWithTitle:@"Gõ tắt phụ âm đầu" hint:@"f→ph, j→gi, w→qu" control:s]];
+    s = [self switchWithAction:@selector(onQuickEndConsonant:)]; self.QuickEndConsonant = s;
+    [quick addObject:[self rowWithTitle:@"Gõ tắt phụ âm cuối" hint:@"g→ng, h→nh, k→ch" control:s]];
+    
+    return [self pageWithTitle:@"Gõ tắt" subtitle:@"Gõ nhanh cụm từ và phụ âm." sections:@[
+        [self sectionWithTitle:@"GÕ TẮT" rows:macro],
+        [self sectionWithTitle:@"GÕ NHANH" rows:quick],
+    ]];
+}
+
+-(NSView*)buildSystemPage {
+    NSSwitch* s;
+    NSMutableArray* startup = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onRunOnStartup:)]; self.RunOnStartupButton = s;
+    [startup addObject:[self rowWithTitle:@"Khởi động cùng macOS" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onShowUIOnStartup:)]; self.ShowUIButton = s;
+    [startup addObject:[self rowWithTitle:@"Mở bảng này khi khởi động" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onGrayIcon:)]; self.UseGrayIcon = s;
+    [startup addObject:[self rowWithTitle:@"Biểu tượng hiện đại trên thanh menu" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onShowIconOnDock:)]; self.ShowIconOnDock = s;
+    [startup addObject:[self rowWithTitle:@"Hiện biểu tượng trên thanh Dock" hint:nil control:s]];
+    
+    NSMutableArray* compat = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onSendKeyStepByStep:)]; self.SendKeyStepByStep = s;
+    [compat addObject:[self rowWithTitle:@"Gửi từng phím" hint:@"Chỉ bật khi gặp lỗi gõ" control:s]];
+    s = [self switchWithAction:@selector(onFixChromiumBrowser:)]; self.FixChromiumBrowser = s;
+    [compat addObject:[self rowWithTitle:@"Sửa lỗi trên Chromium (beta)" hint:@"Cần bật “Sửa lỗi gợi ý”" control:s]];
+    s = [self switchWithAction:@selector(onPerformLayoutCompat:)]; self.PerformLayoutCompat = s;
+    [compat addObject:[self rowWithTitle:@"Tương thích Telex trên bàn phím khác" hint:nil control:s]];
+    s = [self switchWithAction:@selector(onForceEnglishSpotlight:)]; self.ForceEnglishSpotlight = s;
+    [compat addObject:[self rowWithTitle:@"Chuyển sang tiếng Anh khi mở Spotlight" hint:nil control:s]];
+    
+    NSMutableArray* update = [NSMutableArray array];
+    s = [self switchWithAction:@selector(onCheckNewVersionOnStartup:)]; self.CheckNewVersionOnStartup = s;
+    [update addObject:[self rowWithTitle:@"Kiểm tra bản mới lúc khởi động" hint:nil control:s]];
+    NSButton* check = [NSButton buttonWithTitle:@"Kiểm tra bản mới..." target:self action:@selector(onCheckNewVersionButton:)];
+    self.CheckNewVersionButton = check;
+    NSString* version = [NSString stringWithFormat:@"Phiên bản %@ (build %@)",
+                         [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
+                         [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"]];
+    NSString* buildDate = [NSString stringWithFormat:@"Ngày cập nhật %@", [OpenKeyManager getBuildDate]];
+    [update addObject:[self rowWithTitle:version hint:buildDate control:check]];
+    
+    return [self pageWithTitle:@"Hệ thống" subtitle:@"Khởi động, biểu tượng và tương thích." sections:@[
+        [self sectionWithTitle:@"KHỞI ĐỘNG VÀ HIỂN THỊ" rows:startup],
+        [self sectionWithTitle:@"TƯƠNG THÍCH" rows:compat],
+        [self sectionWithTitle:@"CẬP NHẬT" rows:update],
+    ]];
+}
+
+#pragma mark - Actions
 
 - (IBAction)onInputTypeChanged:(NSPopUpButton *)sender {
     [appDelegate onInputTypeSelectedIndex:(int)[self.popupInputType indexOfSelectedItem]];
@@ -244,15 +641,10 @@ extern int vPerformLayoutCompat;
 }
 
 - (IBAction)onLanguageChanged:(id)sender {
-    [appDelegate onInputMethodSelected];
-}
-
-- (IBAction)onRestart:(id)sender {
-    self.appOK.hidden = YES;
-    self.permissionWarning.hidden = YES;
-    self.retryButton.enabled = NO;
-    
-    [self initKey];
+    NSInteger wanted = self.inputMethodControl.selectedSegment == 0 ? 1 : 0;
+    if (wanted != [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"]) {
+        [appDelegate onInputMethodSelected];
+    }
 }
 
 - (IBAction)onFreeMark:(NSButton *)sender {
@@ -371,9 +763,9 @@ extern int vPerformLayoutCompat;
     [self setCustomValue:sender keyToSet:@"vForceEnglishSpotlight"];
 }
 
-- (NSInteger)setCustomValue:(NSButton*)sender keyToSet:(NSString*) key {
+- (NSInteger)setCustomValue:(id)sender keyToSet:(NSString*) key {
     NSInteger val = 0;
-    if (sender.state == NSControlStateValueOn) {
+    if ([sender state] == NSControlStateValueOn) {
         val = 1;
     } else {
         val = 0;
@@ -474,11 +866,7 @@ extern int vPerformLayoutCompat;
     NSInteger value;
     
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
-    if (intInputMethod == 1) {
-        self.VietButton.state = NSControlStateValueOn;
-    } else if (intInputMethod == 0) {
-        self.EngButton.state = NSControlStateValueOn;
-    }
+    self.inputMethodControl.selectedSegment = (intInputMethod == 1) ? 0 : 1;
     
     NSInteger intInputType = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputType"];
     [self.popupInputType selectItemAtIndex:intInputType];

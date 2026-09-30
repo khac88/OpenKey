@@ -9,69 +9,52 @@
 #import <Cocoa/Cocoa.h>
 #import "MyTextField.h"
 
+// The control panel is built in code (see ViewController.m), not in the storyboard.
 @interface ViewController : NSViewController<MyTextFieldDelegate>
-@property (strong) IBOutlet NSView *viewParent;
-@property (weak) IBOutlet NSButton *tabbuttonPrimary;
-@property (weak) IBOutlet NSButton *tabbuttonMacro;
-@property (weak) IBOutlet NSButton *tabbuttonSystem;
-@property (weak) IBOutlet NSButton *tabbuttonInfo;
-@property (weak) IBOutlet NSBox *tabviewPrimary;
-@property (weak) IBOutlet NSBox *tabviewMacro;
-@property (weak) IBOutlet NSBox *tabviewSystem;
-@property (weak) IBOutlet NSBox *tabviewInfo;
 
-@property (weak) IBOutlet NSPopUpButton *popupInputType;
-@property (weak) IBOutlet NSPopUpButton *popupCode;
+@property (weak) NSPopUpButton *popupInputType;
+@property (weak) NSPopUpButton *popupCode;
+@property (weak) NSSegmentedControl *inputMethodControl;
 
-@property (weak) IBOutlet NSBox *appOK;
-@property (weak) IBOutlet NSBox *permissionWarning;
-@property (weak) IBOutlet NSButton *retryButton;
+@property (weak) NSSwitch *FreeMarkButton;
+@property (weak) NSSwitch *UseModernOrthography;
 
-@property (weak) IBOutlet NSButton *VietButton;
-@property (weak) IBOutlet NSButton *EngButton;
+@property (weak) NSSwitch *CheckSpellingButton;
 
-@property (weak) IBOutlet NSButton *FreeMarkButton;
-@property (weak) IBOutlet NSButton *UseModernOrthography;
+@property (weak) NSSwitch *RunOnStartupButton;
+@property (weak) NSSwitch *ShowUIButton;
 
-@property (weak) IBOutlet NSButton *CheckSpellingButton;
+@property (weak) NSSwitch *UseGrayIcon;
+@property (weak) NSSwitch *QuickTelex;
 
-@property (weak) IBOutlet NSButton *RunOnStartupButton;
-@property (weak) IBOutlet NSButton *ShowUIButton;
+@property (weak) NSSwitch *RestoreIfInvalidWord;
+@property (weak) NSSwitch *FixRecommendBrowser;
+@property (weak) NSSwitch *AllowZWJF;
+@property (weak) NSSwitch *TempOffSpellChecking;
 
-@property (weak) IBOutlet NSButton *UseGrayIcon;
-@property (weak) IBOutlet NSButton *QuickTelex;
+@property (weak) NSSwitch *UseMacro;
+@property (weak) NSSwitch *UseMacroInEnglishMode;
 
-@property (weak) IBOutlet NSButton *RestoreIfInvalidWord;
-@property (weak) IBOutlet NSButton *FixRecommendBrowser;
-@property (weak) IBOutlet NSButton *AllowZWJF;
-@property (weak) IBOutlet NSButton *TempOffSpellChecking;
+@property (weak) NSSwitch *SendKeyStepByStep;
+@property (weak) NSSwitch *AutoRememberSwitchKey;
+@property (weak) NSSwitch *UpperCaseFirstChar;
+@property (weak) NSSwitch *QuickStartConsonant;
+@property (weak) NSSwitch *QuickEndConsonant;
 
-@property (weak) IBOutlet NSButton *UseMacro;
-@property (weak) IBOutlet NSButton *UseMacroInEnglishMode;
+@property (weak) NSSwitch *RememberTableCode;
+@property (weak) NSSwitch *OtherLanguage;
 
-@property (weak) IBOutlet NSButton *SendKeyStepByStep;
-@property (weak) IBOutlet NSButton *AutoRememberSwitchKey;
-@property (weak) IBOutlet NSButton *UpperCaseFirstChar;
-@property (weak) IBOutlet NSButton *QuickStartConsonant;
-@property (weak) IBOutlet NSButton *QuickEndConsonant;
+@property (weak) NSSwitch *TempOffOpenKey;
+@property (weak) NSSwitch *AutoCapsMacro;
+@property (weak) NSSwitch *ShowIconOnDock;
+@property (weak) NSSwitch *CheckNewVersionOnStartup;
+@property (weak) NSSwitch *FixChromiumBrowser;
+@property (weak) NSSwitch *PerformLayoutCompat;
+@property (weak) NSSwitch *ForceEnglishSpotlight;
+@property (weak) NSSwitch *AutoRestoreEnglish;
+@property (weak) NSSwitch *IgnoreStandaloneW;
 
-@property (weak) IBOutlet NSButton *RememberTableCode;
-@property (weak) IBOutlet NSButtonCell *OtherLanguage;
-
-@property (weak) IBOutlet NSButton *TempOffOpenKey;
-@property (weak) IBOutlet NSButton *AutoCapsMacro;
-@property (weak) IBOutlet NSButton *ShowIconOnDock;
-@property (weak) IBOutlet NSButton *CheckNewVersionOnStartup;
-@property (weak) IBOutlet NSButton *FixChromiumBrowser;
-@property (weak) IBOutlet NSButton *PerformLayoutCompat;
-@property (weak) IBOutlet NSButton *ForceEnglishSpotlight;
-@property (weak) IBOutlet NSButton *AutoRestoreEnglish;
-@property (weak) IBOutlet NSButton *IgnoreStandaloneW;
-
-@property (weak) IBOutlet NSButton *CheckNewVersionButton;
-@property (weak) IBOutlet NSTextField *VersionInfo;
-
-@property (weak) IBOutlet NSImageView *cursorImage;
+@property (weak) NSButton *CheckNewVersionButton;
 
 -(void)fillData;
 @end
