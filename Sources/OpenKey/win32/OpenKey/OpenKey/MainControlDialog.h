@@ -16,7 +16,10 @@ redistribute your new version, it MUST be open source.
 
 class MainControlDialog : public BaseDialog {
 private:
-	HWND hTab, hTabPage1, hTabPage2, hTabPage3, hTabPage4;
+	enum { BG_CONTENT = 0, BG_SIDEBAR, BG_FOOTER };
+	enum { SIDEBAR_WIDTH_DLU = 95, FOOTER_TOP_DLU = 252 };
+	HWND hTabPage1, hTabPage2, hTabPage3;
+	HWND hNavButtons[3];
 	HWND comboBoxInputType;
 	HWND comboBoxTableCode;
 	HWND checkCtrl, checkAlt, checkWin, checkShift, textSwitchKey, checkBeep;
@@ -34,7 +37,11 @@ private:
 	void onCheckboxClicked(const HWND& hWnd);
 	void onCharacter(const HWND& hWnd, const UINT16& keyCode);
 	void setSwitchKeyText(const HWND& hWnd, const UINT16 & keyCode);
-	void onTabIndexChanged();
+	void showPage(const int& index);
+	void getAreaRects(RECT& sidebar, RECT& footer);
+	int getControlArea(const HWND& control);
+	void paintBackground(const HDC& hdc);
+	static HBRUSH getBackgroundBrush(const int& area);
 	void onUpdateButton();
 	void requestRestartAsAdmin();
 protected:

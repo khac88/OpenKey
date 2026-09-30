@@ -65,14 +65,17 @@ extern int vPerformLayoutCompat;
     parentRect.size.height = 490;
     self.viewParent.frame = parentRect;
     
-    //set correct tabgroup
-    tabviews = [NSArray arrayWithObjects:self.tabviewPrimary, self.tabviewMacro, self.tabviewSystem, self.tabviewInfo, nil];
-    tabbuttons = [NSArray arrayWithObjects:self.tabbuttonPrimary, self.tabbuttonMacro, self.tabbuttonSystem, self.tabbuttonInfo, nil];
+    //set correct tabgroup (the Info tab is replaced by the sidebar and the footer)
+    tabviews = [NSArray arrayWithObjects:self.tabviewPrimary, self.tabviewMacro, self.tabviewSystem, nil];
+    tabbuttons = [NSArray arrayWithObjects:self.tabbuttonPrimary, self.tabbuttonMacro, self.tabbuttonSystem, nil];
     tabViewRect = self.tabviewPrimary.frame;
     for (NSBox* b in tabviews) {
         b.frame = tabViewRect;
     }
-    
+    self.tabviewInfo.hidden = YES;
+    self.tabbuttonInfo.hidden = YES;
+
+    [self applyModernLayout];
     [self showTab:0];
     
     NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex 1", @"Simple Telex 2", nil];
@@ -121,6 +124,93 @@ extern int vPerformLayoutCompat;
     [super setRepresentedObject:representedObject];
 
     // Update the view, if already loaded.
+}
+
+-(void)applyModernLayout {
+    const CGFloat sidebarWidth = 180;
+    const CGFloat footerHeight = 56;
+    NSView* root = self.view;
+
+    //make room for the sidebar (left) and the footer (bottom)
+    BOOL autoresizes = root.autoresizesSubviews;
+    root.autoresizesSubviews = NO;
+    for (NSView* v in root.subviews) {
+        [v setFrameOrigin:NSMakePoint(v.frame.origin.x + sidebarWidth, v.frame.origin.y + footerHeight)];
+    }
+    tabViewRect = NSOffsetRect(tabViewRect, sidebarWidth, footerHeight);
+    NSRect rootFrame = root.frame;
+    rootFrame.size.width += sidebarWidth;
+    rootFrame.size.height += footerHeight;
+    root.frame = rootFrame;
+    root.autoresizesSubviews = autoresizes;
+    CGFloat width = rootFrame.size.width;
+    CGFloat height = rootFrame.size.height;
+
+    //sidebar
+    NSVisualEffectView* sidebar = [[NSVisualEffectView alloc] initWithFrame:NSMakeRect(0, footerHeight, sidebarWidth, height - footerHeight)];
+    sidebar.material = NSVisualEffectMaterialSidebar;
+    sidebar.blendingMode = NSVisualEffectBlendingModeBehindWindow;
+    sidebar.state = NSVisualEffectStateFollowsWindowActiveState;
+    sidebar.autoresizingMask = NSViewHeightSizable | NSViewMaxXMargin;
+    [root addSubview:sidebar positioned:NSWindowBelow relativeTo:nil];
+
+    NSImageView* icon = [NSImageView imageViewWithImage:[NSApp applicationIconImage]];
+    icon.frame = NSMakeRect(16, height - 60, 40, 40);
+    [root addSubview:icon];
+
+    NSTextField* appName = [NSTextField labelWithString:@"OpenKey"];
+    appName.font = [NSFont boldSystemFontOfSize:15];
+    appName.frame = NSMakeRect(62, height - 40, sidebarWidth - 70, 20);
+    [root addSubview:appName];
+
+    NSTextField* version = [NSTextField labelWithString:[NSString stringWithFormat:@"Phiên bản %@",
+                                                         [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"]]];
+    version.font = [NSFont systemFontOfSize:11];
+    version.textColor = [NSColor secondaryLabelColor];
+    version.frame = NSMakeRect(62, height - 57, sidebarWidth - 70, 16);
+    [root addSubview:version];
+
+    //the tab buttons become the sidebar navigation
+    CGFloat y = height - 108;
+    for (NSButton* b in tabbuttons) {
+        [b setButtonType:NSButtonTypePushOnPushOff];
+        b.bezelStyle = NSBezelStyleRecessed;
+        b.showsBorderOnlyWhileMouseInside = YES;
+        b.alignment = NSTextAlignmentLeft;
+        b.font = [NSFont systemFontOfSize:13];
+        b.frame = NSMakeRect(12, y, sidebarWidth - 24, 28);
+        y -= 34;
+    }
+
+    NSButton* checkButton = [NSButton buttonWithTitle:@"Kiểm tra bản mới..." target:self action:@selector(onCheckNewVersionButton:)];
+    checkButton.frame = NSMakeRect(12, footerHeight + 12, sidebarWidth - 24, 32);
+    [root addSubview:checkButton];
+    self.CheckNewVersionButton = checkButton;
+
+    //footer: credit and license notice
+    NSBox* separator = [[NSBox alloc] initWithFrame:NSMakeRect(0, footerHeight - 1, width, 1)];
+    separator.boxType = NSBoxSeparator;
+    separator.autoresizingMask = NSViewWidthSizable;
+    [root addSubview:separator];
+
+    NSFont* footerFont = [NSFont systemFontOfSize:11];
+    NSTextField* credit = [NSTextField labelWithString:@"OpenKey – dựa trên mã nguồn của Mai Vũ Tuyên © 2019"];
+    credit.font = footerFont;
+    credit.textColor = [NSColor secondaryLabelColor];
+    credit.frame = NSMakeRect(20, 30, width - 40, 16);
+    [root addSubview:credit];
+
+    NSMutableAttributedString* license = [[NSMutableAttributedString alloc] initWithString:@"Phát hành theo giấy phép GPL-3.0 · Mã nguồn: "
+                                                                                attributes:@{NSFontAttributeName: footerFont,
+                                                                                             NSForegroundColorAttributeName: [NSColor secondaryLabelColor]}];
+    [license appendAttributedString:[[NSAttributedString alloc] initWithString:@"github.com/khac88/openkey"
+                                                                    attributes:@{NSFontAttributeName: footerFont,
+                                                                                 NSLinkAttributeName: [NSURL URLWithString:@"https://github.com/khac88/openkey"]}]];
+    NSTextField* licenseLabel = [NSTextField labelWithAttributedString:license];
+    licenseLabel.selectable = YES;
+    licenseLabel.allowsEditingTextAttributes = YES;
+    licenseLabel.frame = NSMakeRect(20, 12, width - 40, 16);
+    [root addSubview:licenseLabel];
 }
 
 -(void)showTab:(NSInteger)index {
@@ -534,7 +624,7 @@ extern int vPerformLayoutCompat;
 }
 
 - (IBAction)onSourceCode:(id)sender {
-  [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey"]];
+  [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/khac88/openkey"]];
 }
 
 - (IBAction)onCheckNewVersionButton:(id)sender {

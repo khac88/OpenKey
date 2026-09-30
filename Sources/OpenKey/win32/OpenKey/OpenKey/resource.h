@@ -182,6 +182,12 @@
 #define IDS_STRING_START_CONSONANT      1066
 #define IDS_STRING_END_CONSONANT        1067
 #define IDC_CHECK_OTHER_LANGUAGES       1068
+#define IDC_NAV_INPUT                   1101
+#define IDC_NAV_MACRO                   1102
+#define IDC_NAV_SYSTEM                  1103
+#define IDC_PAGE_AREA                   1104
+#define IDC_STATIC_CREDIT               1105
+#define IDC_SYSLINK_SOURCE_CODE         1106
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

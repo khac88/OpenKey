@@ -86,52 +86,54 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 287, 157
+IDD_ABOUTBOX DIALOGEX 0, 0, 287, 120
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Giới thiệu OpenKey"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    ICON            IDI_APP_ICON,IDC_STATIC,14,17,20,20
-    LTEXT           "OpenKey",IDC_STATIC_APP_TITLE,45,14,206,33,SS_NOPREFIX
-    LTEXT           "Bộ gõ Tiếng Việt nguồn mở đa nền tảng",IDC_STATIC_APP_SUB_TITLE,45,40,215,12
-    LTEXT           "Phien ban",IDC_STATIC_APP_VERSION,45,52,227,8
-    CONTROL         "<a>https://github.com/tuyenvm/OpenKey</a>",IDC_SYSLINK_HOME_PAGE,
-                    "SysLink",WS_TABSTOP,105,79,152,10
-    LTEXT           "Trang chủ:",IDC_STATIC_APP_SUB_TITLE2,45,79,47,8
-    LTEXT           "Phiên bản mới:",IDC_STATIC_APP_SUB_TITLE3,45,91,58,8
-    LTEXT           "Fanpage:",IDC_STATIC_APP_SUB_TITLE4,45,103,47,8
-    CONTROL         "<a>https://github.com/tuyenvm/OpenKey/releases</a>",IDC_SYSLINK_NEW_VERSION,
-                    "SysLink",WS_TABSTOP,105,91,175,10
-    CONTROL         "<a>https://www.facebook.com/OpenKeyVN</a>",IDC_SYSLINK_FANPAGE,
-                    "SysLink",WS_TABSTOP,105,104,175,10
-    CTEXT           "Mai Vũ Tuyên © 2019",IDC_STATIC_APP_SUB_TITLE5,80,142,130,8
-    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_VERSION,44,117,75,14
+    ICON            IDI_APP_ICON,IDC_STATIC,14,14,20,20
+    LTEXT           "OpenKey",IDC_STATIC_APP_TITLE,45,10,206,24,SS_NOPREFIX
+    LTEXT           "Bộ gõ Tiếng Việt nguồn mở đa nền tảng",IDC_STATIC_APP_SUB_TITLE,45,36,230,12
+    LTEXT           "Phien ban",IDC_STATIC_APP_VERSION,45,50,235,9
+    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_VERSION,45,64,80,14
+    CONTROL         "<a>Tải bản mới</a>",IDC_SYSLINK_NEW_VERSION,"SysLink",WS_TABSTOP | 0x1,133,67,100,10
+    LTEXT           "OpenKey – dựa trên mã nguồn của Mai Vũ Tuyên © 2019",IDC_STATIC_CREDIT,14,88,265,9
+    CONTROL         "Phát hành theo giấy phép GPL-3.0 · Mã nguồn: <a>github.com/khac88/openkey</a>",IDC_SYSLINK_SOURCE_CODE,
+                    "SysLink",WS_TABSTOP | 0x1,14,100,265,10
 END
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 297, 261
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 445, 290
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "OpenKey 1.4 - Bộ gõ Tiếng Việt"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+CAPTION "OpenKey - Bộ gõ Tiếng Việt"
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Cài đặt gốc",ID_BTN_DEFAULT,113,234,71,20
-    GROUPBOX        "Điều khiển",IDC_STATIC,7,7,283,73
-    LTEXT           "Kiểu gõ:",IDC_STATIC,14,23,27,8
-    COMBOBOX        IDC_COMBO_INPUT_TYPE,64,20,75,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Bảng mã:",IDC_STATIC,158,23,38,8
-    COMBOBOX        IDC_COMBO_TABLE_CODE,193,20,90,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Phím chuyển:",IDC_STATIC,14,41,44,8
-    CONTROL         "Ctrl",IDC_CHECK_SWITCH_KEY_CTRL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,64,40,27,10
-    CONTROL         "Alt",IDC_CHECK_SWITCH_KEY_ALT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,97,40,25,10
-    CONTROL         "Win",IDC_CHECK_SWITCH_KEY_WIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,126,40,28,10
-    CONTROL         "Shift",IDC_CHECK_SWITCH_KEY_SHIFT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,40,31,10
-    EDITTEXT        IDC_SWITCH_KEY_KEY,193,38,35,12,ES_CENTER | ES_AUTOHSCROLL
-    CONTROL         "Kêu Beep",IDC_CHECK_SWITCH_KEY_BEEP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,243,40,43,10
-    LTEXT           "Chế độ gõ:",IDC_STATIC,14,60,36,8
-    CONTROL         "Tiếng Việt",IDC_RADIO_METHOD_VIETNAMESE,"Button",BS_AUTORADIOBUTTON,64,59,47,10
-    CONTROL         "Tiếng Anh",IDC_RADIO_METHOD_ENGLISH,"Button",BS_AUTORADIOBUTTON,158,59,48,10
-    DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,200,234,71,20
-    PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,26,234,71,20
-    CONTROL         "",IDC_TAB_CONTROL,"SysTabControl32",TCS_FIXEDWIDTH,7,89,283,140
+    LTEXT           "OpenKey",IDC_STATIC_APP_TITLE,12,10,76,15,SS_NOPREFIX
+    LTEXT           "Phiên bản",IDC_STATIC_APP_VERSION_INFO,12,27,76,9,SS_NOPREFIX
+    CONTROL         "Bộ gõ",IDC_NAV_INPUT,"Button",BS_CHECKBOX | BS_PUSHLIKE | WS_GROUP | WS_TABSTOP,7,44,81,18
+    CONTROL         "Gõ tắt",IDC_NAV_MACRO,"Button",BS_CHECKBOX | BS_PUSHLIKE | WS_TABSTOP,7,64,81,18
+    CONTROL         "Hệ thống",IDC_NAV_SYSTEM,"Button",BS_CHECKBOX | BS_PUSHLIKE | WS_TABSTOP,7,84,81,18
+    GROUPBOX        "Điều khiển",IDC_STATIC,103,7,335,74,WS_GROUP
+    LTEXT           "Kiểu gõ:",IDC_STATIC,111,23,44,8
+    COMBOBOX        IDC_COMBO_INPUT_TYPE,160,20,80,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Bảng mã:",IDC_STATIC,258,23,38,8
+    COMBOBOX        IDC_COMBO_TABLE_CODE,300,20,130,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Phím chuyển:",IDC_STATIC,111,41,46,8
+    CONTROL         "Ctrl",IDC_CHECK_SWITCH_KEY_CTRL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,40,28,10
+    CONTROL         "Alt",IDC_CHECK_SWITCH_KEY_ALT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,193,40,26,10
+    CONTROL         "Win",IDC_CHECK_SWITCH_KEY_WIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,40,28,10
+    CONTROL         "Shift",IDC_CHECK_SWITCH_KEY_SHIFT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,258,40,32,10
+    EDITTEXT        IDC_SWITCH_KEY_KEY,300,38,35,12,ES_CENTER | ES_AUTOHSCROLL
+    CONTROL         "Kêu Beep",IDC_CHECK_SWITCH_KEY_BEEP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,348,40,55,10
+    LTEXT           "Chế độ gõ:",IDC_STATIC,111,60,44,8
+    CONTROL         "Tiếng Việt",IDC_RADIO_METHOD_VIETNAMESE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,160,59,55,10
+    CONTROL         "Tiếng Anh",IDC_RADIO_METHOD_ENGLISH,"Button",BS_AUTORADIOBUTTON,258,59,55,10
+    LTEXT           "",IDC_PAGE_AREA,103,88,335,158,NOT WS_VISIBLE | WS_GROUP
+    LTEXT           "OpenKey – dựa trên mã nguồn của Mai Vũ Tuyên © 2019",IDC_STATIC_CREDIT,10,259,255,9
+    CONTROL         "Phát hành theo giấy phép GPL-3.0 · Mã nguồn: <a>github.com/khac88/openkey</a>",IDC_SYSLINK_SOURCE_CODE,
+                    "SysLink",WS_TABSTOP | 0x1,10,271,255,10
+    PUSHBUTTON      "Cài đặt gốc",ID_BTN_DEFAULT,272,262,54,16
+    PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,330,262,54,16
+    DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,388,262,50,16
 END
 
 IDD_DIALOG_MACRO DIALOGEX 0, 0, 415, 253
@@ -183,75 +185,81 @@ BEGIN
     PUSHBUTTON      "Đảo",IDC_BUTTON_CONVERT_SWITCH,124,134,36,14
 END
 
-IDD_DIALOG_TAB_GENERAL DIALOGEX 0, 0, 353, 137
+IDD_DIALOG_TAB_GENERAL DIALOGEX 0, 0, 335, 158
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_TRANSPARENT
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
+    GROUPBOX        "Dấu và chính tả",IDC_STATIC,0,0,335,58
     CONTROL         "Đặt dấu oà, uý (thay vì òa, úy)",IDC_CHECK_MODERN_ORTHORGRAPHY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,12,126,10
-    CONTROL         "Sửa lỗi gợi ý (trình duyệt, Excel)",IDC_CHECK_FIX_RECOMMEND_BROWSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,128,10
-    CONTROL         "Kiểm tra chính tả",IDC_CHECK_SPELLING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,12,104,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,13,155,10
+    CONTROL         "Kiểm tra chính tả",IDC_CHECK_SPELLING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,13,155,10
     CONTROL         "Tự khôi phục phím với từ sai",IDC_CHECK_RESTORE_IF_WRONG_SPELLING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,31,122,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,27,155,10
     CONTROL         "Cho phép ""z w j f"" làm phụ âm đầu",IDC_CHECK_ALLOW_ZJWF,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,50,125,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,27,155,10
     CONTROL         "Tạm tắt chính tả bằng phím Ctrl",IDC_CHECK_TEMP_OFF_SPELLING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,69,123,10
-    CONTROL         "Loại trừ ứng dụng thông minh",IDC_CHECK_SMART_SWITCH_KEY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,69,111,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,41,155,10
+    GROUPBOX        "Thông minh",IDC_STATIC,0,64,335,58
+    CONTROL         "Sửa lỗi gợi ý (trình duyệt, Excel)",IDC_CHECK_FIX_RECOMMEND_BROWSER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,77,155,10
     CONTROL         "Viết Hoa chữ cái đầu câu",IDC_CHECK_CAPS_FIRST_CHAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,77,155,10
+    CONTROL         "Loại trừ ứng dụng thông minh",IDC_CHECK_SMART_SWITCH_KEY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,91,155,10
     CONTROL         "Tự ghi nhớ bảng mã theo ứng dụng",IDC_CHECK_SMART_SWITCH_CODE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,130,10
-    CONTROL         "Cho phép gõ trong các ngôn ngữ khác",IDC_CHECK_OTHER_LANGUAGES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,106,204,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,91,155,10
     CONTROL         "Tạm tắt OpenKey bằng phím Alt",IDC_CHECK_TEMP_OFF_OPEN_KEY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,123,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,105,155,10
+    CONTROL         "Cho phép gõ trong các ngôn ngữ khác",IDC_CHECK_OTHER_LANGUAGES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,105,155,10
 END
 
-IDD_DIALOG_TAB_MACRO DIALOGEX 0, 0, 299, 177
+IDD_DIALOG_TAB_MACRO DIALOGEX 0, 0, 335, 158
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_TRANSPARENT
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    CONTROL         "Gõ nhanh (cc=ch, gg=gi, nn=ng,...)",IDC_CHECK_QUICK_TELEX,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,133,12,136,10
-    CONTROL         "Cho phép gõ tắt",IDC_CHECK_USE_MACRO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,12,99,10
+    GROUPBOX        "Gõ tắt",IDC_STATIC,0,0,335,58
+    CONTROL         "Cho phép gõ tắt",IDC_CHECK_USE_MACRO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,13,180,10
     CONTROL         "Gõ tắt cả khi tắt gõ tiếng Việt",IDC_CHECK_USE_MACRO_IN_ENGLISH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,116,10
-    PUSHBUTTON      "Bảng gõ tắt...",IDC_BUTTON_MACRO_TABLE,7,70,60,14
-    CONTROL         "Gõ tắt phụ âm đầu: f→ph, j→gi, w→qu",IDC_CHECK_QUICK_START_CONSONANT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,133,31,147,10
-    CONTROL         "Gõ tắt phụ âm cuối: g→ng, h→nh, k→ch",IDC_CHECK_QUICK_END_CONSONANT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,133,51,147,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,27,180,10
     CONTROL         "Tự động viết hoa theo phím tắt",IDC_CHECK_AUTO_CAPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,121,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,41,180,10
+    PUSHBUTTON      "Bảng gõ tắt...",IDC_BUTTON_MACRO_TABLE,257,11,70,14
+    GROUPBOX        "Gõ nhanh",IDC_STATIC,0,64,335,58
+    CONTROL         "Gõ nhanh (cc=ch, gg=gi, nn=ng,...)",IDC_CHECK_QUICK_TELEX,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,77,315,10
+    CONTROL         "Gõ tắt phụ âm đầu: f→ph, j→gi, w→qu",IDC_CHECK_QUICK_START_CONSONANT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,91,315,10
+    CONTROL         "Gõ tắt phụ âm cuối: g→ng, h→nh, k→ch",IDC_CHECK_QUICK_END_CONSONANT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,105,315,10
 END
 
-IDD_DIALOG_TAB_SYSTEM DIALOGEX 0, 0, 344, 177
+IDD_DIALOG_TAB_SYSTEM DIALOGEX 0, 0, 335, 158
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_TRANSPARENT
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    CONTROL         "Bật bảng này khi khởi động",IDC_CHECK_SHOW_ON_STARTUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,122,10
-    CONTROL         "Biểu tượng hiện đại",IDC_CHECK_MODERN_ICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,69,103,10
+    GROUPBOX        "Khởi động và hiển thị",IDC_STATIC,0,0,335,62
     CONTROL         "Khởi động cùng Windows",IDC_CHECK_RUN_WITH_WINDOWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,89,119,10
-    CONTROL         "Chạy với quyền Admin",IDC_CHECK_RUN_AS_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,31,119,10
-    CONTROL         "Kiểm tra bản mới lúc khởi động",IDC_CHECK_CHECK_UPDATE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,70,119,10
-    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_UPDATE,151,88,75,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,13,155,10
+    CONTROL         "Bật bảng này khi khởi động",IDC_CHECK_SHOW_ON_STARTUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,13,155,10
+    CONTROL         "Biểu tượng hiện đại",IDC_CHECK_MODERN_ICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,27,155,10
     CONTROL         "Tạo biểu tượng trên Desktop",IDC_CHECK_CHECK_CREATE_SHORTCUT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,119,10
-    CONTROL         "Sửa lỗi trên Chromium (beta)",IDC_CHECK_FIX_CHROMIUM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,12,119,10
-    CONTROL         "Dùng Clipboard để gửi phím",IDC_CHECK_USE_CLIPBOARD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,50,119,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,27,155,10
+    CONTROL         "Kiểm tra bản mới lúc khởi động",IDC_CHECK_CHECK_UPDATE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,43,155,10
+    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_UPDATE,172,41,80,14
+    GROUPBOX        "Tương thích",IDC_STATIC,0,68,335,44
     CONTROL         "Hỗ trợ ứng dụng Metro",IDC_CHECK_SUPPORT_METRO_APP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,12,119,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,81,155,10
+    CONTROL         "Sửa lỗi trên Chromium (beta)",IDC_CHECK_FIX_CHROMIUM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,81,155,10
+    CONTROL         "Dùng Clipboard để gửi phím",IDC_CHECK_USE_CLIPBOARD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,95,155,10
+    CONTROL         "Chạy với quyền Admin",IDC_CHECK_RUN_AS_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,95,155,10
 END
 
 IDD_DIALOG_OLD DIALOGEX 0, 0, 316, 268
@@ -261,27 +269,6 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,200,247,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,259,247,50,14
-END
-
-IDD_DIALOG_TAB_INFO DIALOGEX 0, 0, 287, 119
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-EXSTYLE WS_EX_TRANSPARENT
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    ICON            IDI_APP_ICON,IDC_STATIC,10,13,20,20
-    LTEXT           "OpenKey - Bộ gõ Tiếng Việt nguồn mở đa nền tảng",IDC_STATIC_APP_TITLE,39,9,206,8,SS_NOPREFIX
-    LTEXT           "Trang chủ",IDC_STATIC_APP_TITLE2,39,19,37,8,SS_NOPREFIX
-    CONTROL         "<a>https://open-key.org</a>",IDC_SYSLINK_HOME_PAGE,
-                    "SysLink",WS_TABSTOP,81,19,101,10
-    LTEXT           "Facebook",IDC_STATIC_APP_TITLE3,39,29,37,8,SS_NOPREFIX
-    CONTROL         "<a>https://www.facebook.com/OpenKeyVN</a>",IDC_SYSLINK_FANPAGE,
-                    "SysLink",WS_TABSTOP,81,29,184,10
-    LTEXT           "OpenKey cho Windows là phần mềm mã nguồn mở và được phát hành miễn phí. Bạn hoàn toàn có thể đóng góp ý kiến, yêu cầu tính năng mới qua email của tác giả hoặc trên github.",IDC_STATIC_APP_SUB_TITLE5,39,61,234,28
-    LTEXT           "Mai Vũ Tuyên © 2019 - ",IDC_STATIC_APP_SUB_TITLE6,39,94,78,8
-    CONTROL         "<a>maivutuyen.91@gmail.com</a>",IDC_SYSLINK_AUTHOR_EMAIL,
-                    "SysLink",WS_TABSTOP,117,94,101,10
-    LTEXT           "Phien ban",IDC_STATIC_APP_VERSION_INFO,39,50,227,8
-    PUSHBUTTON      "Mã nguồn...",IDC_BUTTON_GO_SOURCE_CODE,226,91,50,14
 END
 
 
@@ -298,15 +285,15 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 280
         TOPMARGIN, 7
-        BOTTOMMARGIN, 150
+        BOTTOMMARGIN, 113
     END
 
     IDD_DIALOG_MAIN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 290
+        RIGHTMARGIN, 438
         TOPMARGIN, 7
-        BOTTOMMARGIN, 254
+        BOTTOMMARGIN, 283
     END
 
     IDD_DIALOG_MACRO, DIALOG
@@ -327,26 +314,26 @@ BEGIN
 
     IDD_DIALOG_TAB_GENERAL, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 346
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 130
+        LEFTMARGIN, 0
+        RIGHTMARGIN, 335
+        TOPMARGIN, 0
+        BOTTOMMARGIN, 158
     END
 
     IDD_DIALOG_TAB_MACRO, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 292
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 170
+        LEFTMARGIN, 0
+        RIGHTMARGIN, 335
+        TOPMARGIN, 0
+        BOTTOMMARGIN, 158
     END
 
     IDD_DIALOG_TAB_SYSTEM, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 337
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 170
+        LEFTMARGIN, 0
+        RIGHTMARGIN, 335
+        TOPMARGIN, 0
+        BOTTOMMARGIN, 158
     END
 
     IDD_DIALOG_OLD, DIALOG
@@ -357,13 +344,6 @@ BEGIN
         BOTTOMMARGIN, 261
     END
 
-    IDD_DIALOG_TAB_INFO, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 280
-        TOPMARGIN, 9
-        BOTTOMMARGIN, 112
-    END
 END
 #endif    // APSTUDIO_INVOKED
 

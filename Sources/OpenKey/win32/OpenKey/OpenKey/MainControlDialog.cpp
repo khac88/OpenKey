@@ -55,38 +55,34 @@ void MainControlDialog::initDialog() {
     }
     createToolTip(comboBoxTableCode, IDS_STRING_CODE);
 
-    //init tabview
-    hTab = GetDlgItem(hDlg, IDC_TAB_CONTROL);
-    TCITEM tci = { 0 };
-    tci.mask = TCIF_TEXT;
-    tci.pszText = (LPWSTR)_T("Bộ gõ");
-    TabCtrl_InsertItem(hTab, 0, &tci);
-    tci.pszText = (LPWSTR)_T("Gõ tắt");
-    TabCtrl_InsertItem(hTab, 1, &tci);
-    tci.pszText = (LPWSTR)_T("Hệ thống");
-    TabCtrl_InsertItem(hTab, 2, &tci);
-    tci.pszText = (LPWSTR)_T("Thông tin");
-    TabCtrl_InsertItem(hTab, 3, &tci);
-    RECT r;
-    TabCtrl_GetItemRect(hTab, 0, &r);
-    TabCtrl_SetItemSize(hTab, r.right - r.left, (r.bottom - r.top) * 1.428f);
+    //sidebar title
+    HDC hdc = GetDC(hDlg);
+    HFONT hTitleFont = CreateFont(-MulDiv(14, GetDeviceCaps(hdc, LOGPIXELSY), 72), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
+        DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_SWISS, _T("Segoe UI"));
+    ReleaseDC(hDlg, hdc);
+    SendDlgItemMessage(hDlg, IDC_STATIC_APP_TITLE, WM_SETFONT, WPARAM(hTitleFont), TRUE);
 
-    //create tab page
+    wchar_t versionBuffer[128];
+    wsprintfW(versionBuffer, _T("Phiên bản %s"), OpenKeyHelper::getVersionString().c_str());
+    SetDlgItemText(hDlg, IDC_STATIC_APP_VERSION_INFO, versionBuffer);
+
+    //sidebar navigation
+    hNavButtons[0] = GetDlgItem(hDlg, IDC_NAV_INPUT);
+    hNavButtons[1] = GetDlgItem(hDlg, IDC_NAV_MACRO);
+    hNavButtons[2] = GetDlgItem(hDlg, IDC_NAV_SYSTEM);
+
+    //create pages
     hTabPage1 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_GENERAL), hDlg, tabPageEventProc, (LPARAM)this);
     hTabPage2 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_MACRO), hDlg, tabPageEventProc, (LPARAM)this);
     hTabPage3 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_SYSTEM), hDlg, tabPageEventProc, (LPARAM)this);
-    hTabPage4 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_INFO), hDlg, tabPageEventProc, (LPARAM)this);
-    RECT rc;//find tab control's rectangle
-    GetWindowRect(hTab, &rc);
-    POINT offset = { 0 };
-    ScreenToClient(hDlg, &offset);
-    OffsetRect(&rc, offset.x, offset.y); //convert to client coordinates
-    rc.top += (LONG)((r.bottom - r.top) * 1.428f);
-    SetWindowPos(hTabPage1, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 5, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage2, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage3, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage4, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
-    onTabIndexChanged();
+    RECT rc;//find page area's rectangle
+    GetWindowRect(GetDlgItem(hDlg, IDC_PAGE_AREA), &rc);
+    MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rc, 2); //convert to client coordinates
+    SetWindowPos(hTabPage1, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPage2, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPage3, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    showPage(0);
 
     checkCtrl = GetDlgItem(hDlg, IDC_CHECK_SWITCH_KEY_CTRL);
     createToolTip(checkCtrl, IDS_STRING_CTRL);
@@ -167,7 +163,7 @@ void MainControlDialog::initDialog() {
     checkMacroAutoCaps = GetDlgItem(hTabPage2, IDC_CHECK_AUTO_CAPS);
     createToolTip(checkMacroAutoCaps, IDS_STRING_MACRO_AUTO_CAP);
 
-    hUpdateButton = GetDlgItem(hDlg, IDC_BUTTON_CHECK_UPDATE);
+    hUpdateButton = GetDlgItem(hTabPage3, IDC_BUTTON_CHECK_UPDATE);
 
     /*------------end tab 2----------------*/
 
@@ -200,9 +196,6 @@ void MainControlDialog::initDialog() {
 
     /*------------end tab 3----------------*/
 
-    SendDlgItemMessage(hDlg, IDBUTTON_OK, BM_SETIMAGE, IMAGE_ICON, (LPARAM)LoadIcon(hIns, MAKEINTRESOURCEW(IDI_ICON_OK_BUTTON)));
-    SendDlgItemMessage(hDlg, ID_BTN_DEFAULT, BM_SETIMAGE, IMAGE_ICON, (LPARAM)LoadIcon(hIns, MAKEINTRESOURCEW(IDI_ICON_DEFAULT_BUTTON)));
-    SendDlgItemMessage(hDlg, IDBUTTON_EXIT, BM_SETIMAGE, IMAGE_ICON, (LPARAM)LoadIcon(hIns, MAKEINTRESOURCEW(IDI_ICON_EXIT_BUTTON)));
     fillData();
 }
 
@@ -239,8 +232,14 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
         case IDC_BUTTON_CHECK_UPDATE:
             onUpdateButton();
             break;
-        case IDC_BUTTON_GO_SOURCE_CODE:
-            ShellExecute(NULL, _T("open"), _T("https://github.com/tuyenvm/OpenKey"), NULL, NULL, SW_SHOWNORMAL);
+        case IDC_NAV_INPUT:
+            showPage(0);
+            break;
+        case IDC_NAV_MACRO:
+            showPage(1);
+            break;
+        case IDC_NAV_SYSTEM:
+            showPage(2);
             break;
         default:
             if (HIWORD(wParam) == CBN_SELCHANGE) {
@@ -262,26 +261,93 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
     }
     case WM_NOTIFY: {
         switch (((LPNMHDR)lParam)->code) {
-        case TCN_SELCHANGE:
-            onTabIndexChanged();
-            break;
         case NM_CLICK:
         case NM_RETURN: {
             PNMLINK link = (PNMLINK)lParam;
-            if (link->hdr.idFrom == IDC_SYSLINK_HOME_PAGE)
-                ShellExecute(NULL, _T("open"), _T("http://open-key.org"), NULL, NULL, SW_SHOWNORMAL);
-            else if (link->hdr.idFrom == IDC_SYSLINK_FANPAGE)
-                ShellExecute(NULL, _T("open"), _T("https://www.facebook.com/OpenKeyVN"), NULL, NULL, SW_SHOWNORMAL);
-            else if (link->hdr.idFrom == IDC_SYSLINK_AUTHOR_EMAIL)
-                ShellExecute(NULL, _T("open"), _T("mailto:maivutuyen.91@gmail.com"), NULL, NULL, SW_SHOWNORMAL);
+            if (link->hdr.idFrom == IDC_SYSLINK_SOURCE_CODE)
+                ShellExecute(NULL, _T("open"), _T("https://github.com/khac88/openkey"), NULL, NULL, SW_SHOWNORMAL);
             break;
         }
         }
         break;
     }
+    case WM_ERASEBKGND:
+        if (hDlg == this->hDlg) {
+            paintBackground((HDC)wParam);
+            SetWindowLongPtr(hDlg, DWLP_MSGRESULT, TRUE);
+            return TRUE;
+        }
+        break;
+    case WM_CTLCOLORDLG:
+        if (hDlg == this->hDlg) {
+            return (INT_PTR)getBackgroundBrush(BG_CONTENT);
+        }
+        break;
+    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLORBTN:
+        if (hDlg == this->hDlg) {
+            SetBkMode((HDC)wParam, TRANSPARENT);
+            return (INT_PTR)getBackgroundBrush(getControlArea((HWND)lParam));
+        }
+        break;
     }
 
     return FALSE;
+}
+
+HBRUSH MainControlDialog::getBackgroundBrush(const int& area) {
+    static HBRUSH contentBrush = CreateSolidBrush(RGB(0xFF, 0xFF, 0xFF));
+    static HBRUSH sidebarBrush = CreateSolidBrush(RGB(0xF3, 0xF3, 0xF3));
+    static HBRUSH footerBrush = CreateSolidBrush(RGB(0xF9, 0xF9, 0xF9));
+    if (area == BG_SIDEBAR) return sidebarBrush;
+    if (area == BG_FOOTER) return footerBrush;
+    return contentBrush;
+}
+
+void MainControlDialog::getAreaRects(RECT& sidebar, RECT& footer) {
+    RECT client, dlu = { SIDEBAR_WIDTH_DLU, FOOTER_TOP_DLU, 0, 0 };
+    GetClientRect(hDlg, &client);
+    MapDialogRect(hDlg, &dlu);
+    footer = client;
+    footer.top = dlu.top;
+    sidebar = client;
+    sidebar.right = dlu.left;
+    sidebar.bottom = footer.top;
+}
+
+int MainControlDialog::getControlArea(const HWND& control) {
+    RECT sidebar, footer, rc;
+    getAreaRects(sidebar, footer);
+    GetWindowRect(control, &rc);
+    MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rc, 2);
+    if (rc.top >= footer.top) return BG_FOOTER;
+    if (rc.right <= sidebar.right) return BG_SIDEBAR;
+    return BG_CONTENT;
+}
+
+void MainControlDialog::paintBackground(const HDC& hdc) {
+    RECT client, sidebar, footer;
+    GetClientRect(hDlg, &client);
+    getAreaRects(sidebar, footer);
+    FillRect(hdc, &client, getBackgroundBrush(BG_CONTENT));
+    FillRect(hdc, &sidebar, getBackgroundBrush(BG_SIDEBAR));
+    FillRect(hdc, &footer, getBackgroundBrush(BG_FOOTER));
+
+    //separator lines
+    static HBRUSH lineBrush = CreateSolidBrush(RGB(0xE5, 0xE5, 0xE5));
+    RECT line = { sidebar.right - 1, sidebar.top, sidebar.right, sidebar.bottom };
+    FillRect(hdc, &line, lineBrush);
+    line = { footer.left, footer.top, footer.right, footer.top + 1 };
+    FillRect(hdc, &line, lineBrush);
+}
+
+void MainControlDialog::showPage(const int& index) {
+    ShowWindow(hTabPage1, (index == 0) ? SW_SHOW : SW_HIDE);
+    ShowWindow(hTabPage2, (index == 1) ? SW_SHOW : SW_HIDE);
+    ShowWindow(hTabPage3, (index == 2) ? SW_SHOW : SW_HIDE);
+    for (int i = 0; i < 3; i++) {
+        SendMessage(hNavButtons[i], BM_SETCHECK, (i == index) ? BST_CHECKED : BST_UNCHECKED, 0);
+    }
 }
 
 INT_PTR MainControlDialog::tabPageEventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -370,11 +436,6 @@ void MainControlDialog::fillData() {
     EnableWindow(checkAllowZWJF, vCheckSpelling);
     EnableWindow(checkTempOffSpelling, vCheckSpelling);
     EnableWindow(checkFixChromium, vFixRecommendBrowser);
-
-    //tab info
-    wchar_t buffer[256];
-    wsprintfW(buffer, _T("Phiên bản %s cho Windows - Ngày cập nhật: %s"), OpenKeyHelper::getVersionString().c_str(), _T(__DATE__));
-    SendDlgItemMessage(hTabPage4, IDC_STATIC_APP_VERSION_INFO, WM_SETTEXT, 0, LPARAM(buffer));
 }
 
 void MainControlDialog::setSwitchKey(const unsigned short& code) {
@@ -590,14 +651,6 @@ void MainControlDialog::setSwitchKeyText(const HWND& hWnd, const UINT16& keyCode
         Uint16 key[] = { keyCode, 0 };
         SetWindowText(hWnd, (LPCWSTR)&key);
     }
-}
-
-void MainControlDialog::onTabIndexChanged() {
-    int index = TabCtrl_GetCurSel(hTab);
-    ShowWindow(hTabPage1, (index == 0) ? SW_SHOW : SW_HIDE);
-    ShowWindow(hTabPage2, (index == 1) ? SW_SHOW : SW_HIDE);
-    ShowWindow(hTabPage3, (index == 2) ? SW_SHOW : SW_HIDE);
-    ShowWindow(hTabPage4, (index == 3) ? SW_SHOW : SW_HIDE);
 }
 
 void MainControlDialog::onUpdateButton() {
