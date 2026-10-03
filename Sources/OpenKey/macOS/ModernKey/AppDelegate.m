@@ -193,17 +193,31 @@ extern bool convertToolDontAlertWhenCompleted;
                                                      action:@selector(onInputMethodSelected)
                                               keyEquivalent:@""];
     [theMenu addItem:[NSMenuItem separatorItem]];
-    NSMenuItem* menuInputType = [theMenu addItemWithTitle:@"Kiểu gõ" action:nil keyEquivalent:@""];
+    
+    //input types and code tables are listed directly so they take one click
+    [theMenu addItem:[NSMenuItem sectionHeaderWithTitle:@"Kiểu gõ"]];
+    mnuTelex = [theMenu addItemWithTitle:@"Telex" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuTelex.tag = 0;
+    mnuVNI = [theMenu addItemWithTitle:@"VNI" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuVNI.tag = 1;
+    mnuSimpleTelex1 = [theMenu addItemWithTitle:@"Simple Telex 1" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuSimpleTelex1.tag = 2;
+    mnuSimpleTelex2 = [theMenu addItemWithTitle:@"Simple Telex 2" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuSimpleTelex2.tag = 3;
     
     [theMenu addItem:[NSMenuItem separatorItem]];
     
+    [theMenu addItem:[NSMenuItem sectionHeaderWithTitle:@"Bảng mã"]];
     mnuUnicode = [theMenu addItemWithTitle:@"Unicode dựng sẵn" action:@selector(onCodeSelected:) keyEquivalent:@""];
     mnuUnicode.tag = 0;
     mnuTCVN = [theMenu addItemWithTitle:@"TCVN3 (ABC)" action:@selector(onCodeSelected:) keyEquivalent:@""];
     mnuTCVN.tag = 1;
     mnuVNIWindows = [theMenu addItemWithTitle:@"VNI Windows" action:@selector(onCodeSelected:) keyEquivalent:@""];
     mnuVNIWindows.tag = 2;
-    NSMenuItem* menuCode = [theMenu addItemWithTitle:@"Bảng mã khác" action:nil keyEquivalent:@""];
+    mnuUnicodeComposite = [theMenu addItemWithTitle:@"Unicode tổ hợp" action:@selector(onCodeSelected:) keyEquivalent:@""];
+    mnuUnicodeComposite.tag = 3;
+    mnuVietnameseLocaleCP1258 = [theMenu addItemWithTitle:@"Vietnamese Locale CP 1258" action:@selector(onCodeSelected:) keyEquivalent:@""];
+    mnuVietnameseLocaleCP1258.tag = 4;
     
     [theMenu addItem:[NSMenuItem separatorItem]];
     
@@ -219,9 +233,6 @@ extern bool convertToolDontAlertWhenCompleted;
     
     [theMenu addItemWithTitle:@"Thoát" action:@selector(terminate:) keyEquivalent:@"q"];
     
-    
-    [self setInputTypeMenu:menuInputType];
-    [self setCodeMenu:menuCode];
     
     //set menu
     [statusItem setMenu:theMenu];
@@ -315,33 +326,6 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 #pragma mark -StatusBar menu data
-
-- (void)setInputTypeMenu:(NSMenuItem*) parent {
-    //sub for Kieu Go
-    NSMenu *sub = [[NSMenu alloc] initWithTitle:@""];
-    [sub setAutoenablesItems:NO];
-    mnuTelex = [sub addItemWithTitle:@"Telex" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
-    mnuTelex.tag = 0;
-    mnuVNI = [sub addItemWithTitle:@"VNI" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
-    mnuVNI.tag = 1;
-    mnuSimpleTelex1 = [sub addItemWithTitle:@"Simple Telex 1" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
-    mnuSimpleTelex1.tag = 2;
-    mnuSimpleTelex2 = [sub addItemWithTitle:@"Simple Telex 2" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
-    mnuSimpleTelex2.tag = 3;
-    [theMenu setSubmenu:sub forItem:parent];
-}
-
-- (void)setCodeMenu:(NSMenuItem*) parent {
-    //sub for Code
-    NSMenu *sub = [[NSMenu alloc] initWithTitle:@""];
-    [sub setAutoenablesItems:NO];
-    mnuUnicodeComposite = [sub addItemWithTitle:@"Unicode tổ hợp" action:@selector(onCodeSelected:) keyEquivalent:@""];
-    mnuUnicodeComposite.tag = 3;
-    mnuVietnameseLocaleCP1258 = [sub addItemWithTitle:@"Vietnamese Locale CP 1258" action:@selector(onCodeSelected:) keyEquivalent:@""];
-    mnuVietnameseLocaleCP1258.tag = 4;
-    
-    [theMenu setSubmenu:sub forItem:parent];
-}
 
 - (void) fillData {
     //fill data
