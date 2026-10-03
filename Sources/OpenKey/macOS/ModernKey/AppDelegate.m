@@ -450,7 +450,7 @@ static pid_t SecureInputOwnerPID(void) {
         NSString* appName = [NSRunningApplication runningApplicationWithProcessIdentifier:pid].localizedName;
         if (appName == nil)
             appName = @"một ứng dụng khác";
-        mnuSecureInput.title = [NSString stringWithFormat:@"Đang bị khóa bởi %@ (ô mật khẩu)", appName];
+        mnuSecureInput.title = [NSString stringWithFormat:@"Đang bị khóa bởi %@ (nhập bảo mật)", appName];
         statusItem.button.toolTip = [NSString stringWithFormat:@"OpenKey tạm không gõ được: %@ đang bật chế độ nhập bảo mật", appName];
     }
     if (active == secureInputActive)
@@ -463,6 +463,7 @@ static pid_t SecureInputOwnerPID(void) {
         [self showSecureInputIcon];
     } else {
         statusItem.button.toolTip = nil;
+        RequestNewSession(); //keys typed while locked were never seen, drop the stale word
         [self fillData]; //restore the normal V / E icon
     }
 }
