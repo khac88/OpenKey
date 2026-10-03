@@ -18,6 +18,7 @@
 		232EDA6121F1B33F0085D362 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 232EDA5F21F1B33F0085D362 /* Main.storyboard */; };
 		232EDA6421F1B33F0085D362 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 232EDA6321F1B33F0085D362 /* main.m */; };
 		233C4A6E231F923D00DD7052 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 233C4A6D231F923D00DD7052 /* AppKit.framework */; };
+		B7E1C0DE2A6F4E1000A1B2C3 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23A984BE220ED07E000914A2 /* IOKit.framework */; };
 		233C4A70231F937900DD7052 /* ConvertTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 233C4A6F231F937900DD7052 /* ConvertTool.cpp */; };
 		2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2345899922F720D7003E0923 /* MacroViewController.mm */; };
 		234F70AC21FB50BD00D2F2CA /* StatusHighlightedEng.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */; };
@@ -142,6 +143,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A534F32629D8B78100296F25 /* Carbon.framework in Frameworks */,
+				B7E1C0DE2A6F4E1000A1B2C3 /* IOKit.framework in Frameworks */,
 				233C4A6E231F923D00DD7052 /* AppKit.framework in Frameworks */,
 				23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */,
 				23851A0121F1C1A400E79A41 /* CoreGraphics.framework in Frameworks */,

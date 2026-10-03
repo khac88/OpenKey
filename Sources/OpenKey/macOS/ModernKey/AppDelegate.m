@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h>
 #import <Cocoa/Cocoa.h>
 #import <ServiceManagement/ServiceManagement.h>
+#import <IOKit/IOKitLib.h>
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "OpenKeyManager.h"
@@ -89,6 +90,34 @@ extern bool convertToolDontAlertWhenCompleted;
     NSMenuItem* mnuVietnameseLocaleCP1258;
     
     NSMenuItem* mnuQuickConvert;
+    
+    NSMenuItem* mnuSecureInput;
+    NSMenuItem* mnuSecureInputSeparator;
+    NSTimer* secureInputTimer;
+    BOOL secureInputActive;
+}
+
+// PID of the app that turned on Secure Event Input (usually a focused password field), 0 if unknown.
+static pid_t SecureInputOwnerPID(void) {
+    pid_t pid = 0;
+    io_registry_entry_t root = IORegistryGetRootEntry(kIOMainPortDefault);
+    if (root == MACH_PORT_NULL)
+        return 0;
+    CFTypeRef users = IORegistryEntryCreateCFProperty(root, CFSTR("IOConsoleUsers"), kCFAllocatorDefault, 0);
+    IOObjectRelease(root);
+    if (users && CFGetTypeID(users) == CFArrayGetTypeID()) {
+        for (CFIndex i = 0; i < CFArrayGetCount((CFArrayRef)users) && pid == 0; i++) {
+            CFTypeRef user = CFArrayGetValueAtIndex((CFArrayRef)users, i);
+            if (CFGetTypeID(user) != CFDictionaryGetTypeID())
+                continue;
+            CFTypeRef value = CFDictionaryGetValue((CFDictionaryRef)user, CFSTR("kCGSSessionSecureInputPID"));
+            if (value && CFGetTypeID(value) == CFNumberGetTypeID())
+                CFNumberGetValue((CFNumberRef)value, kCFNumberIntType, &pid);
+        }
+    }
+    if (users)
+        CFRelease(users);
+    return pid;
 }
 
 -(void)askPermission {
@@ -141,6 +170,7 @@ extern bool convertToolDontAlertWhenCompleted;
         NSBeep();
 
     [self createStatusBarMenu];
+    [self startSecureInputMonitor];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -188,6 +218,15 @@ extern bool convertToolDontAlertWhenCompleted;
     
     theMenu = [[NSMenu alloc] initWithTitle:@""];
     [theMenu setAutoenablesItems:NO];
+    
+    //shown only while another app holds Secure Event Input and OpenKey cannot read the keyboard
+    mnuSecureInput = [theMenu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+    mnuSecureInput.enabled = NO;
+    mnuSecureInput.image = [NSImage imageWithSystemSymbolName:@"lock.fill" accessibilityDescription:nil];
+    mnuSecureInput.hidden = YES;
+    mnuSecureInputSeparator = [NSMenuItem separatorItem];
+    mnuSecureInputSeparator.hidden = YES;
+    [theMenu addItem:mnuSecureInputSeparator];
     
     menuInputMethod = [theMenu addItemWithTitle:@"Bật Tiếng Việt"
                                                      action:@selector(onInputMethodSelected)
@@ -387,7 +426,52 @@ extern bool convertToolDontAlertWhenCompleted;
     //
     NSInteger intRunOnStartup = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
     [self setRunOnStartup:intRunOnStartup ? YES : NO];
+    
+    if (secureInputActive)
+        [self showSecureInputIcon];
+}
 
+#pragma mark -Secure Event Input
+
+-(void)startSecureInputMonitor {
+    secureInputTimer = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(checkSecureInput) userInfo:nil repeats:YES];
+    secureInputTimer.tolerance = 0.3;
+    [[NSRunLoop mainRunLoop] addTimer:secureInputTimer forMode:NSRunLoopCommonModes];
+    [self checkSecureInput];
+}
+
+-(void)checkSecureInput {
+    BOOL active = IsSecureEventInputEnabled();
+    if (!active && !secureInputActive)
+        return;
+    
+    if (active) {
+        pid_t pid = SecureInputOwnerPID();
+        NSString* appName = [NSRunningApplication runningApplicationWithProcessIdentifier:pid].localizedName;
+        if (appName == nil)
+            appName = @"một ứng dụng khác";
+        mnuSecureInput.title = [NSString stringWithFormat:@"Đang bị khóa bởi %@ (ô mật khẩu)", appName];
+        statusItem.button.toolTip = [NSString stringWithFormat:@"OpenKey tạm không gõ được: %@ đang bật chế độ nhập bảo mật", appName];
+    }
+    if (active == secureInputActive)
+        return;
+    
+    secureInputActive = active;
+    mnuSecureInput.hidden = !active;
+    mnuSecureInputSeparator.hidden = !active;
+    if (active) {
+        [self showSecureInputIcon];
+    } else {
+        statusItem.button.toolTip = nil;
+        [self fillData]; //restore the normal V / E icon
+    }
+}
+
+-(void)showSecureInputIcon {
+    NSImage* lock = [NSImage imageWithSystemSymbolName:@"lock.fill" accessibilityDescription:@"OpenKey bị khóa"];
+    [lock setTemplate:YES];
+    statusItem.button.image = lock;
+    statusItem.button.alternateImage = nil;
 }
 
 -(void)onImputMethodChanged:(BOOL)willNotify {

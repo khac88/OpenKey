@@ -80,6 +80,13 @@ static CFRunLoopSourceRef runLoopSource;
     return YES;
 }
 
+// macOS turns the tap off when a callback is too slow (or on some user input);
+// without this the keyboard hook stays dead until OpenKey is restarted.
++(void)reenableEventTap {
+    if (eventTap && !CGEventTapIsEnabled(eventTap))
+        CGEventTapEnable(eventTap, true);
+}
+
 +(BOOL)stopEventTap {
     if (_isInited) { //release all object
         CFRunLoopStop(CFRunLoopGetCurrent());
