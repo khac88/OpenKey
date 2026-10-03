@@ -302,8 +302,16 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)setRunOnStartup:(BOOL)val {
-    CFStringRef appId = (__bridge CFStringRef)@"com.tuyenmai.OpenKeyHelper";
-    SMLoginItemSetEnabled(appId, val);
+    SMAppService *service = [SMAppService mainAppService];
+    SMAppServiceStatus status = service.status;
+    BOOL registered = status == SMAppServiceStatusEnabled || status == SMAppServiceStatusRequiresApproval;
+    if (val == registered)
+        return;
+
+    NSError *error = nil;
+    BOOL ok = val ? [service registerAndReturnError:&error] : [service unregisterAndReturnError:&error];
+    if (!ok)
+        NSLog(@"Error on %@ login item: %@", val ? @"register" : @"unregister", error);
 }
 
 -(void)setGrayIcon:(BOOL)val {

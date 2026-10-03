@@ -7,6 +7,7 @@
 //
 
 #import "MacroViewController.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #include "Engine.h"
 
 #define MACRO_ADD_TEXT @"Thêm"
@@ -84,7 +85,7 @@
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setCanChooseDirectories:NO];
-    [openPanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
+    openPanel.allowedContentTypes = @[UTTypePlainText];
     [openPanel setExtensionHidden:NO];
     [openPanel setNameFieldStringValue:@"OpenKeyMacro"];
     [openPanel makeKeyAndOrderFront:nil];
@@ -95,7 +96,7 @@
         [alert addButtonWithTitle:@"Có"];
         [alert addButtonWithTitle:@"Không"];
         [alert setMessageText:@"Dữ liệu gõ tắt"];
-        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleCritical];
         [alert beginSheetModalForWindow:self.view.window completionHandler:^(NSModalResponse returnCode) {
             readFromFile(openPanel.URL.path.UTF8String, returnCode == 1000);
             [self saveAndReload];
@@ -108,7 +109,7 @@
     savePanel.canCreateDirectories = YES;
     [savePanel setMessage:@"Chọn nơi lưu dữ liệu gõ tắt"];
     [savePanel setTitle:@"Chọn nơi lưu dữ liệu gõ tắt"];
-    [savePanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
+    savePanel.allowedContentTypes = @[UTTypePlainText];
     [savePanel setExtensionHidden:NO];
     [savePanel setNameFieldStringValue:@"OpenKeyMacro"];
     if ([savePanel runModal] == NSModalResponseOK) {
@@ -121,7 +122,7 @@
     [alert setInformativeText:msg];
     [alert addButtonWithTitle:@"OK"];
     [alert setMessageText:@"Gõ tắt"];
-    [alert setAlertStyle:NSCriticalAlertStyle];
+    [alert setAlertStyle:NSAlertStyleCritical];
     [alert beginSheetModalForWindow:self.view.window completionHandler:^(NSModalResponse returnCode) {
         
     }];

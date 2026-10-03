@@ -4,89 +4,49 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib</key>
 		<data>
-		x+TsYs920KzsiRK1KYs/tqd5Jw8=
+		msfqeFFsp+wrb1c2vCNCODa5UcE=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib</key>
 		<data>
-		s5b6meUvFI3uQy/ij8tmdxqypvA=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib/keyedobjects-110000.nib</key>
-		<data>
-		kMkqkGsiFGJAa/qlUdH1Db2NaNE=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib/keyedobjects.nib</key>
-		<data>
-		uTFLX3zOip/iTZ6F0V5TxOSmYvQ=
+		rFLrIELxpCVkj2fi9+tyI6iOjgk=
 		</data>
 		<key>Resources/Base.lproj/Main.storyboardc/Info.plist</key>
 		<data>
-		4nC1sjc1afzwv6tvTZZrocL+M5M=
+		J7kDI6aZjChJcDeD0H9mfXY0SBU=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib</key>
 		<data>
-		3j7rAGs2e7oTjH04/ww7VIywpyo=
+		EMoUs0QShFG7+U6IX3INJBqRfqU=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib</key>
 		<data>
-		YY8nIfsRCHBpz8Ax6HVI7xpqmdg=
+		9PKZwqvzxn4Iz2Tpt7BixHD3b6Q=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib</key>
 		<data>
-		uDaNWjjHWexXYoNkk+AydRZdle8=
+		OSNjG+gBJOWv08XTQKkKoPr7V5Q=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib</key>
 		<data>
-		OC903+A7B6mBdQa2TAvIlwvQhMk=
+		AzT3JbuuzS/JJDmbjI98z7PM4bE=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib</key>
 		<data>
-		uLsy6T+uLQEo+knhNJm5FrLeBnA=
+		n+2GM3eOJSpzD8oeM2+J+ZgDo6g=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib</key>
 		<data>
-		kXFpD/vrK9vgshqj8K9A9wYiLJM=
+		6B3dRGqDJi3fWwxg08YCOn2Lgck=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib</key>
 		<data>
-		Nh8yFVicOSdnUioZcy2tz1ReIa4=
+		+W/pZEicnu9xwRphEmMTRXtXa50=
 		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib</key>
 		<data>
-		nYlntXL1+oqzHJMhHi0gxrmW1UE=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib/keyedobjects-110000.nib</key>
-		<data>
-		VUiXb/OogceTqbr91xxNdecXdDM=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib/keyedobjects.nib</key>
-		<data>
-		06Ms0orI2Kgy7c/tpre9WFViojA=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib/keyedobjects-110000.nib</key>
-		<data>
-		PCdAIJ5DdTy9w/69Sg0FyQuVQf8=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib/keyedobjects.nib</key>
-		<data>
-		Q8VjzCchz++GpraAscB31u/+Rb8=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib/keyedobjects-110000.nib</key>
-		<data>
-		ivIaXZ3qG41E5GPubPiX6+nLAMw=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib/keyedobjects.nib</key>
-		<data>
-		XCNU9vO21QLtDNLao1dCnmFCog0=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib/keyedobjects-110000.nib</key>
-		<data>
-		6i99Z4sTkOwvYJauoej/Omk8kBM=
-		</data>
-		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib/keyedobjects.nib</key>
-		<data>
-		2xSQcCDUKr276TX6EqRmSN7HUGk=
+		HBVEYN+KHVeXUAVP96j2/3ywDLs=
 		</data>
 		<key>Resources/ExitButton@2x.png</key>
 		<data>
@@ -127,151 +87,81 @@
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			4IeaiFZkeChc1mic4n48/M6GKaOfSxvNxyqA8jHS/nk=
+			yFpBsTxRTtnbrodYVNRs+IftssVkFkCo1sGBbw+HWC0=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/AboutWindow.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			u3aUjboBgir9Znpb5+32ZmpPjFhpufCNCTZJCjzZkcY=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib/keyedobjects-110000.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			DuzXCnY9F7J3WN3IXBTTxwyDmTjTyip04uiA0OWugKk=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/ConvertWindow.nib/keyedobjects.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			3uc3+LPrVs/xFgdt4CXPNm5wF9DBHNvf+/YLXH5KEuw=
+			TxORiLRxtTEWQ6q+7lIaTVT0pFoAPRs9LWWYyiJ31Dw=
 			</data>
 		</dict>
 		<key>Resources/Base.lproj/Main.storyboardc/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			viZSL7oZ7p1A3zsKcXbYqfxztmhoBPooIe5zIdY3d2g=
+			cgO5QDSQbrBUNnZPw1Qca0LBpAgW1OIGHyiOzd1PpNU=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			LeaZ46nleRYuuMz3NoqBeSZJ0qEEQx4bT39T7Dg+Mr0=
+			TzoQO295S5VfVzsUBgRkni2si93MQxigMU4vMSNHw5w=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/MacroWindow.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			aK0sU0L/qO1p3az6oYkUshAVFgzjdNfiDvjyGIOtLrE=
+			2aj8tbHLB1DucDsYCvwtOyqKz69ojUQ+HtdOmvTz9Iw=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0PMoLjsSV9RTfCYqwu+6Yb+f6ML5K06d5/TicbZn5So=
+			+gMoVbV9YXAxPwcxpoY09stpWkoUwboc6lCGOBjH7Lw=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/MainMenu.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			LkbV0Dtk5gNl6uNHVD2wTfnHyI7v54M6UIq2WwOOIo4=
+			5DmMQj4UzIQiAucrdrCp63qYNsf4Baak+ZYpTCQgmwc=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			55GOOlbKjfP0U5e5Fal40/AREThPScocLC8p5NXExK0=
+			RSQp4ADClJWQBHyMwo82Ygz3iHHtJ5x+hsmUeVHJcfI=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKey.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			tJ3ANGUsQWGUX1dzZF1h5cjua7vGtdAZ/9TsveoJL2g=
+			23G8bVtLoTvn5f/LbfEOTS2x7EksO/ucImfCSsrrnIE=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib/keyedobjects-110000.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			6NHiCwJMkLLKhAnAktbbB9VroptH6IrZGm51E8KEcdQ=
+			xthY2fV9PRLsO9k4XPJWq0qdDbOVVT2OY/OgCnX+M/I=
 			</data>
 		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/OpenKeyPanel.nib/keyedobjects.nib</key>
+		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			n5ttiu8W1MDfz8cRexJ+83YZlqU3kvpRW7ntpacA9Xo=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib/keyedobjects-110000.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			I2kSdlywf+bfEzpUoKjyUPJ/vjrdgyRnQi8Jz1t+T7U=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/SDG-I4-o9t-view-ATQ-uD-hpO.nib/keyedobjects.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			RQAp48MmgSO4npyRT2BKstkZnyhZnL3WT1LcQMs6vlE=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib/keyedobjects-110000.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			7Hi5dpnEUwsN4YFoXF0cpguYLEofbDlsXPQa9y9jSxA=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/XIf-Yi-IFu-view-edt-o3-AiW.nib/keyedobjects.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Wv6ldEDFi9v3ni7KVrBIQ6dS6tY/Vu3BgN5u8V0lXSk=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib/keyedobjects-110000.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			dsmB0KB2RcCnVmLObrVgL6cB/fGl/rLivyH/BzjXS/Q=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/XfG-lQ-9wD-view-m2S-Jp-Qdl.nib/keyedobjects.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			R+4wgQqQc+lluEIYRCIGtimmMoGMZM1TGhBOsMXoJDw=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib/keyedobjects-110000.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			1fVH4y4m78UvGyw/FjWMeU+0OZczUJEEnCGHQGNBu/0=
-			</data>
-		</dict>
-		<key>Resources/Base.lproj/Main.storyboardc/t29-xc-bE6-view-aY5-zg-GIA.nib/keyedobjects.nib</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Xt3LYbdivwuuwSzaYIYzZcIfb2yKVu0Z6/N34DmIZaA=
+			SGYwH8W45P6nroV/FFjQMOiES/7c9hY+Eg709mLXHjk=
 			</data>
 		</dict>
 		<key>Resources/ExitButton@2x.png</key>
